@@ -10,7 +10,7 @@ namespace GTFuckingXP.Managers
     {
         public static void ApplyCustomScalingEffects(PlayerAgent targetAgent, List<CustomScalingBuff> buffs)
         {
-            if (buffs is null)
+            if (!targetAgent.IsLocallyOwned || buffs is null)
                 return;
 
             ResetCustomBuffs(targetAgent);
@@ -35,8 +35,6 @@ namespace GTFuckingXP.Managers
 
         private static void SetCustomBuff(CustomScaling customBuff, float value, PlayerAgent targetAgent)
         {
-            if (!targetAgent.IsLocallyOwned) return;
-
             var playerData = targetAgent.PlayerData;
 
             switch (customBuff)
@@ -166,6 +164,8 @@ namespace GTFuckingXP.Managers
 
         public static void ResetCustomBuffs(PlayerAgent targetAgent)
         {
+            if (!targetAgent.IsLocallyOwned) return;
+
             foreach (CustomScaling customBuff in Enum.GetValues(typeof(CustomScaling)))
                 if (CacheApiWrapper.HasDefaultCustomScaling(customBuff))
                     SetCustomBuff(customBuff, GetResetModifier(customBuff), targetAgent);
@@ -208,7 +208,7 @@ namespace GTFuckingXP.Managers
             {
                 // Add clip ammo to reserves, apply modifier, then fill clip up to previous number if possible.
                 slotAmmo.AmmoInPack += item.GetCurrentClip() * slotAmmo.CostOfBullet;
-                slotAmmo.Setup(slotAmmo.CostOfBullet *= lastValue / value, slotAmmo.BulletClipSize);
+                slotAmmo.Setup(slotAmmo.CostOfBullet * lastValue / value, slotAmmo.BulletClipSize);
                 newClip = Math.Min(slotAmmo.BulletsInPack, item.GetCurrentClip());
                 item.SetCurrentClip(newClip);
                 slotAmmo.AmmoInPack -= newClip * slotAmmo.CostOfBullet;

@@ -9,6 +9,7 @@ namespace GTFuckingXP.Patches
     internal static class SentryGunFiringPatches
     {
         [HarmonyPatch(nameof(SentryGunInstance_Firing_Bullets.UpdateAmmo))]
+        [HarmonyWrapSafe]
         [HarmonyPrefix]
         private static void PrefixSentryAmmo(SentryGunInstance_Firing_Bullets __instance)
         {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json;
 
 namespace GTFuckingXP.Information.ClassSelector
 {
@@ -7,12 +8,6 @@ namespace GTFuckingXP.Information.ClassSelector
     /// </summary>
     public class Group
     {
-        public Group(int persistentId, string name, List<int> visibleForPlayerCount)
-        {
-            PersistentId = persistentId;
-            Name = name;
-            VisibleForPlayerCount = visibleForPlayerCount;
-        }
 
         /// <summary>
         /// Gets or sets the single existing key for this <see cref="Group"/>.
@@ -23,6 +18,12 @@ namespace GTFuckingXP.Information.ClassSelector
         /// Gets or sets all playercounts that this header is visible.
         /// </summary>
         public List<int> VisibleForPlayerCount { get; set; }
+
+        /// <summary>
+        /// Allows the class to be used for player counts > 4 if 4 is allowed.
+        /// </summary>
+        /// 
+        public bool ExpandAboveFourCount { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the name this group should run under.

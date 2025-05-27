@@ -150,7 +150,7 @@ namespace GTFuckingXP.Managers
         {
             var serializerSettings = new JsonSerializerOptions
             {
-                IncludeFields = false,
+                IncludeFields = true,
                 ReadCommentHandling = JsonCommentHandling.Skip,
                 PropertyNameCaseInsensitive = true,
                 WriteIndented = true

@@ -7,8 +7,6 @@ using GTFuckingXP.Information.Level;
 using GTFuckingXP.Patches.SelectLevelPatches;
 using HarmonyLib;
 using SNetwork;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GTFuckingXP.Patches
 {
@@ -27,7 +25,7 @@ namespace GTFuckingXP.Patches
 
             var classInGroup = groups.FirstOrDefault(it => it.PersistentId == classLayout.GroupPersistentId);
 
-            if(!classInGroup.VisibleForPlayerCount.Contains(__instance.PlayersInSession.Count))
+            if((!classInGroup.ExpandAboveFourCount || classInGroup.VisibleForPlayerCount.Max() < 4) && !classInGroup.VisibleForPlayerCount.Contains(__instance.PlayersInSession.Count))
             {
                 //TODO do Standard class
                 if (GameStateManager.Current.m_currentStateName == eGameStateName.Lobby)
