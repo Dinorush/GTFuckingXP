@@ -1,5 +1,5 @@
 ﻿<Project>
-    <PropertyGroup>
-        <GameFolder>C:\Program Files (x86)\Steam\steamapps\common\GTFO</GameFolder>
-    </PropertyGroup>
+	<PropertyGroup>
+		<GameFolder>SomePathTo\r2modmanPlus-local\GTFO\profiles\SomeProfile</GameFolder>
+	</PropertyGroup>
 </Project>
