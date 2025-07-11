@@ -20,15 +20,14 @@ namespace GTFuckingXP
     [BepInDependency("dev.gtfomodding.gtfo-api", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("Endskill.EndskApi", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.dak.FloatingTextAPI", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInDependency(ESCWrapper.PLUGIN_GUID, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(CCWrapper.PLUGIN_GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("Dinorush.MovementSpeedAPI", BepInDependency.DependencyFlags.HardDependency)]
     public class BepInExLoader : BasePlugin
     {
         public const string
         MODNAME = "GTFuckingXP",
         AUTHOR = "Endskill",
         GUID = AUTHOR + "." + MODNAME,
-        VERSION = "2.4.1";
+        VERSION = "2.4.4";
 
         public static bool RundownDevMode { get; private set; }
         public static ConfigEntry<bool> DebugMessages { get; private set; }
@@ -76,7 +75,6 @@ namespace GTFuckingXP
             BoosterBuffManager.Instance = new BoosterBuffManager();
 
             NetworkApiXpManager.Setup();
-            ESCWrapper.Init();
 
             Harmony = new Harmony(GUID);
             FasterPatching();
@@ -107,8 +105,7 @@ namespace GTFuckingXP
             if (ShowPlayerLevels.Value)
                 Harmony.PatchAll(typeof(PlaceNavMarkerOnGoPatches));
             Harmony.PatchAll(typeof(SnetSessionHubPatches));
-            if (!CCWrapper.HasCC) // CConsole native patches the function we need, can't patch if it exists
-                Harmony.PatchAll(typeof(PlayerRegenPatches));
+            Harmony.PatchAll(typeof(PlayerRegenPatches));
         }
 
         private void TermsOfUsageChanged(object sender, EventArgs e)

@@ -15,8 +15,22 @@ namespace GTFuckingXp.Patches
         [HarmonyPrefix]
         private static void Prefix_BulletDamage(Dam_PlayerDamageLimb __instance, ref float dam, Agent sourceAgent)
         {
-            if (!__instance.m_base.Owner.Alive)
+            PlayerAgent player = __instance.m_base.Owner;
+            if (!player.Alive)
                 return;
+
+            Level? level;
+            if (player.IsLocallyOwned)
+                level = CacheApiWrapper.GetActiveLevel();
+            else
+                level = CacheApiWrapper.GetPlayerToLevelMapping().GetValueOrDefault(player.PlayerSlotIndex);
+
+            if (level != null)
+            {
+                CustomScalingBuff? buff = level.CustomScaling.FirstOrDefault(buff => buff.CustomBuff == CustomScaling.BulletResistance);
+                if (buff != null)
+                    dam *= 2f - buff.Value;
+            }
 
             if (sourceAgent != null)
             {

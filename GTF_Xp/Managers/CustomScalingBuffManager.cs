@@ -2,6 +2,7 @@
 using GTFuckingXP.Enums;
 using GTFuckingXP.Extensions;
 using GTFuckingXP.Information.Level;
+using MovementSpeedAPI;
 using Player;
 
 namespace GTFuckingXP.Managers
@@ -60,25 +61,21 @@ namespace GTFuckingXP.Managers
                     meleeData.AttackSphereRadius = meleeHitbox * value;
                     break;
                 case CustomScaling.MovementSpeedMultiplier:
-                    if (ESCWrapper.HasESC)
+                    if (!CacheApiWrapper.TryGetDefaultCustomScaling(customBuff, out ISpeedModifier speedModifier))
                     {
-                        ESCWrapper.RefreshMovementSpeed();
-                        break;
-                    }
+                        if (value == 1f) break;
 
-                    if (!CacheApiWrapper.TryGetDefaultCustomScaling(customBuff, out (float walk, float run, float crouch, float air) movementInfo))
+                        speedModifier = MoveSpeedAPI.AddModifier(value);
+                        CacheApiWrapper.SetDefaultCustomScaling(customBuff, speedModifier);
+                    }
+                    else if (value == 1f)
                     {
-                        movementInfo.walk = playerData.walkMoveSpeed;
-                        movementInfo.run = playerData.runMoveSpeed;
-                        movementInfo.crouch = playerData.crouchMoveSpeed;
-                        movementInfo.air = playerData.airMoveSpeed;
-                        CacheApiWrapper.SetDefaultCustomScaling(customBuff, movementInfo);
+                        speedModifier.Disable();
                     }
-
-                    playerData.walkMoveSpeed = movementInfo.walk * value;
-                    playerData.runMoveSpeed = movementInfo.run * value;
-                    playerData.crouchMoveSpeed = movementInfo.crouch * value;
-                    playerData.airMoveSpeed = movementInfo.air * value;
+                    else
+                    {
+                        speedModifier.Enable(value);
+                    }
                     break;
                 //case CustomScaling.AntiFogSphere:
                 //    break;
@@ -169,8 +166,6 @@ namespace GTFuckingXP.Managers
             foreach (CustomScaling customBuff in Enum.GetValues(typeof(CustomScaling)))
                 if (CacheApiWrapper.HasDefaultCustomScaling(customBuff))
                     SetCustomBuff(customBuff, GetResetModifier(customBuff), targetAgent);
-
-            ESCWrapper.RefreshMovementSpeed(); // Has no default but we need this to be refreshed on level drop
         }
 
         public static void ClearDefaultCustomBuffs()

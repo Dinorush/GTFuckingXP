@@ -17,7 +17,6 @@
 
 	<PropertyGroup>
 		<BIELibsFolder>$(GameFolder)\BepInEx\core</BIELibsFolder>
-		<CorLibsFolder>$(GameFolder)\dotnet\corlib</CorLibsFolder>
 		<InteropLibsFolder>$(GameFolder)\BepInEx\interop</InteropLibsFolder>
 		<PluginsFolder>$(GameFolder)/BepInEx/plugins</PluginsFolder>
 	</PropertyGroup>
@@ -35,10 +34,6 @@
 		<Reference Include="$(BIELibsFolder)\MonoMod.RuntimeDetour.dll" Private="false" />
 		<Reference Include="$(BIELibsFolder)\Il2CppInterop.*.dll" Private="false" />
 
-		<!-- CoreCLR -->
-		<Reference Include="$(CorLibsFolder)\*.dll" Private="false" />
-		<Reference Include="$(CorLibsFolder)\..\System.Private.CoreLib.dll" Private="false" />
-
 		<!-- Interop -->
 		<Reference Include="$(InteropLibsFolder)/*.dll" Private="false" />
 		<Reference Remove="$(InteropLibsFolder)/netstandard.dll" />
@@ -48,7 +43,7 @@
 	<!--Other plugin dependencies -->
 	<ItemGroup>
 		<Reference Include="$(PluginsFolder)/GTFO-API.dll"/>
-		<Reference Include="$(PluginsFolder)/FloatingTextAPI.dll"/>
-		<Reference Include="$(PluginsFolder)/DoubleJump.dll"/>
+		<Reference Include="$(PluginsFolder)\**\FloatingTextAPI.dll"/>
+		<Reference Include="$(PluginsFolder)\**\DoubleJump.dll"/>
 	</ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -11,7 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EndskApiNet\EndskApiNet.csproj" />
+	<PackageReference Include="VersionInfoGenerator" Version="2.1.3"/>
+	<ProjectReference Include="..\EndskApiNet\EndskApiNet.csproj" />
     <ProjectReference Include="..\GTF_Xp\GTF_Xp.csproj" />
   </ItemGroup>
 

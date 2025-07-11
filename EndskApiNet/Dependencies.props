@@ -17,7 +17,6 @@
 	<!-- Path Info -->
 	<PropertyGroup>
 		<BIELibsFolder>$(GameFolder)\BepInEx\core</BIELibsFolder>
-		<CorLibsFolder>$(GameFolder)\dotnet</CorLibsFolder>
 		<InteropLibsFolder>$(GameFolder)\BepInEx\interop</InteropLibsFolder>
 		<PluginsFolder>$(GameFolder)\BepInEx\plugins</PluginsFolder>
 	</PropertyGroup>
@@ -39,7 +38,7 @@
 	<!-- Plugin Dependencies -->
 	<ItemGroup>
 		<Reference Include="$(PluginsFolder)\GTFO-API.dll" Private="false" />
-		<Reference Include="$(PluginsFolder)\FloatingTextAPI.dll" Private="false" />
+		<Reference Include="$(PluginsFolder)\**\FloatingTextAPI.dll" Private="false" />
 	</ItemGroup>
 
 	<!-- NuGet Packages -->
@@ -50,12 +49,4 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
-
-	<!-- MSBuild Action-->
-	<Target Name="CustomAfterBuild" AfterTargets="Build" Condition="$(CopyBuildToPluginFolder) == 'true'">
-		<Message Text="Copying Output to Plugins Folder..." Importance="High"/>
-		<Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll"
-			  DestinationFolder="$(PluginsFolder)"/>
-		<Message Text="Output has copied to Plugins Folder!" Importance="High"/>
-	</Target>
 </Project>

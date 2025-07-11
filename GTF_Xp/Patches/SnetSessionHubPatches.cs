@@ -4,6 +4,7 @@ using GTFuckingXP.Communication;
 using GTFuckingXP.Extensions;
 using GTFuckingXP.Information.ClassSelector;
 using GTFuckingXP.Information.Level;
+using GTFuckingXP.Managers;
 using GTFuckingXP.Patches.SelectLevelPatches;
 using HarmonyLib;
 using SNetwork;
@@ -14,16 +15,22 @@ namespace GTFuckingXP.Patches
     public class SnetSessionHubPatches
     {
         [HarmonyPatch(nameof(SNet_SessionHub.AddPlayerToSession))]
+        [HarmonyWrapSafe]
         [HarmonyPostfix]
         public static void AddPlayerToSessionPostfix(SNet_SessionHub __instance)
         {
-            if(!CacheApiWrapper.TryGetCurrentLevelLayout(out var classLayout))
+            if(!CacheApiWrapper.TryGetCurrentLevelLayout(out var classLayout) || !SNet.HasLocalPlayer)
             {
                 return;
             }
             var groups = CacheApi.GetInstance<List<Group>>( CacheApiWrapper.XpModCacheName);
 
             var classInGroup = groups.FirstOrDefault(it => it.PersistentId == classLayout.GroupPersistentId);
+            if (classInGroup == null)
+            {
+                LogManager.Warn($"Found no valid group for class {classLayout.Header}, id {classLayout.PersistentId}, group id {classLayout.GroupPersistentId}");
+                return;
+            }
 
             if((!classInGroup.ExpandAboveFourCount || classInGroup.VisibleForPlayerCount.Max() < 4) && !classInGroup.VisibleForPlayerCount.Contains(__instance.PlayersInSession.Count))
             {

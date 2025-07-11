@@ -18,5 +18,6 @@
         AmmoEfficiency,
         ToolEfficiency,
         ExplosionResistance,
+        BulletResistance
     }
 }
