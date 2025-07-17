@@ -15,7 +15,7 @@ namespace EndskApi
        MODNAME = "EndskApi",
        AUTHOR = "Endskill",
        GUID = AUTHOR + "." + MODNAME,
-       VERSION = "1.2.0";
+       VERSION = "1.2.1";
 
         public static Harmony Harmony { get; private set; }
         public static ConfigFile ConfigLoader { get; private set; }
