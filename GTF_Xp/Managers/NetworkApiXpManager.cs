@@ -17,7 +17,12 @@ namespace GTFuckingXP.Managers
     /// </summary>
     public static class NetworkApiXpManager
     {
+        private static readonly Dictionary<ulong, uint> _clientXP = new();
+        private static readonly Dictionary<ulong, uint> _checkpointXP = new();
+
         private const string _sendXpString = "ThisSeemsLikeItComesFromTheRandomXpMod...";
+        private const string _initXpString = "XpModJoinClientXP";
+        private const string _requestXpString = "XpModClientRequestXP";
         private const string _levelStatsDistribution = "ReachedSentLevel_XP";
         private const string _receiveStaticXp = "XpModTriesToGiveYouSomeHalfAssedXP";
         private const string _undistributedXp = "XpModGivesYouSomeXpWhereYouHadNotToDoAnything";
@@ -30,6 +35,31 @@ namespace GTFuckingXP.Managers
             NetworkAPI.RegisterEvent<StaticXpInfo>(_receiveStaticXp, ReceiveStaticXp);
             NetworkAPI.RegisterEvent<BoosterInfo>(_sendBoosterNetworkString, ReceiveBoosterBuffs);
             NetworkAPI.RegisterEvent<GtfoApiXpInfo>(_undistributedXp, ReceiveHalfAssedXp);
+            NetworkAPI.RegisterEvent<InitXpInfo>(_initXpString, ReceiveInitXp);
+            NetworkAPI.RegisterEvent<bool>(_requestXpString, ReceiveRequestXp);
+            CheckpointApi.AddCheckpointReachedCallback(OnCheckpointReached);
+            CheckpointApi.AddCheckpointReloadedCallback(OnCheckpointReloaded);
+            LevelAPI.OnLevelCleanup += OnLevelCleanup;
+        }
+
+        private static void OnLevelCleanup()
+        {
+            _clientXP.Clear();
+            _checkpointXP.Clear();
+        }
+
+        private static void OnCheckpointReached()
+        {
+            _checkpointXP.Clear();
+            foreach (var kv in _clientXP)
+                _checkpointXP.Add(kv.Key, kv.Value);
+        }
+
+        private static void OnCheckpointReloaded()
+        {
+            _clientXP.Clear();
+            foreach (var kv in _checkpointXP)
+                _clientXP.Add(kv.Key, kv.Value);
         }
 
         public static void ReceiveXp(ulong snetPlayer, GtfoApiXpInfo xpData)
@@ -55,6 +85,26 @@ namespace GTFuckingXP.Managers
             if (CacheApi.TryGetInstance(out XpHandler xpHandler, CacheApiWrapper.XpModCacheName))
             {
                 xpHandler.AddXp(xpInfo, xpInfo.Position, false, "<#F30>");
+            }
+        }
+
+        public static void ReceiveInitXp(ulong snetPlayer, InitXpInfo xpInfo)
+        {
+            if (CacheApi.TryGetInstance(out XpHandler xpHandler, CacheApiWrapper.XpModCacheName))
+            {
+                xpHandler.SkipToXp(xpInfo.Xp);
+                if (xpInfo.CheckpointXp > 0)
+                    CacheApiWrapper.SetXpStorageData(xpInfo.CheckpointXp);
+            }
+        }
+
+        public static void ReceiveRequestXp(ulong lookup, bool _)
+        {
+            if (_clientXP.TryGetValue(lookup, out var xp) && xp > 0 && SNet.TryGetPlayer(lookup, out var player))
+            {
+                if (!_checkpointXP.TryGetValue(lookup, out var checkpointXP))
+                    checkpointXP = 0;
+                NetworkAPI.InvokeEvent(_initXpString, new InitXpInfo(xp, checkpointXP), player);
             }
         }
 
@@ -98,12 +148,17 @@ namespace GTFuckingXP.Managers
 
         public static void SendReceiveXp(SNet_Player receiver, EnemyXp xpData, Vector3 position, bool forceDebuffXp)
         {
+            TrackClientXp(receiver, xpData, forceDebuffXp);
             NetworkAPI.InvokeEvent(_sendXpString, new GtfoApiXpInfo(xpData.XpGain, xpData.DebuffXp, xpData.LevelScalingXpDecrese, position, forceDebuffXp),
                 receiver);
         }
 
         public static void SendHalfAssedXp(EnemyXp xpData, Vector3 position, bool forceDebuffXp)
         {
+            foreach (var player in PlayerManager.PlayerAgentsInLevel)
+                if (!player.IsLocallyOwned)
+                    TrackClientXp(player.Owner, xpData, forceDebuffXp);
+
             NetworkAPI.InvokeEvent(_undistributedXp, new GtfoApiXpInfo(xpData.XpGain, xpData.DebuffXp, xpData.LevelScalingXpDecrese, position, forceDebuffXp));
         }
 
@@ -124,6 +179,33 @@ namespace GTFuckingXP.Managers
         public static void SendStaticXpInfo(SNet_Player receiver, uint xpGain, uint debuffXp, int levelScalingDecrease, Vector3 position)
         {
             NetworkAPI.InvokeEvent(_receiveStaticXp, new StaticXpInfo(xpGain, debuffXp, levelScalingDecrease, position), receiver);
+        }
+
+        public static void SendRequestXp()
+        {
+            NetworkAPI.InvokeEvent(_requestXpString, false, SNet.Master);
+        }
+
+        private static void TrackClientXp(SNet_Player receiver, EnemyXp xpData, bool forceDebuffXp)
+        {
+            uint xpValue = forceDebuffXp ? xpData.DebuffXp : xpData.XpGain;
+
+            int levelScalingDecreaseXp = 0;
+            if (CacheApiWrapper.GetPlayerToLevelMapping().TryGetValue(receiver.PlayerSlotIndex(), out var level))
+                levelScalingDecreaseXp = xpData.LevelScalingXpDecrese * level.LevelNumber;
+
+            if (xpValue <= levelScalingDecreaseXp)
+            {
+                xpValue = 1;
+            }
+            else
+            {
+                xpValue = (uint)(xpValue - levelScalingDecreaseXp);
+            }
+
+            if (!_clientXP.ContainsKey(receiver.Lookup))
+                _clientXP.Add(receiver.Lookup, 0);
+            _clientXP[receiver.Lookup] += xpValue;
         }
     }
 }

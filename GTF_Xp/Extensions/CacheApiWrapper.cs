@@ -107,7 +107,6 @@ namespace GTFuckingXP.Extensions
 
             foreach (var callBack in GetLvlUpCallBackList())
             {
-                LogManager.Message("Doing some weird Lvl Up callback stuff");
                 callBack.Invoke(newLevel);
             }
         }
@@ -148,12 +147,12 @@ namespace GTFuckingXP.Extensions
 
         public static void SetXpStorageData(uint knownXpState)
         {
-            CacheApi.SaveInformation(CheckpointData, (GetCurrentLevelLayout(), knownXpState, XpModCacheName));
+            CacheApi.SaveInformation(CheckpointData, (GetCurrentLevelLayout(), knownXpState), XpModCacheName);
         }
 
         public static bool TryGetXpStorageData(out (LevelLayout levelLayout, uint totalXp) checkpointData)
         {
-            return CacheApi.TryGetInformation(CheckpointData, out checkpointData, XpModCacheName);
+            return CacheApi.TryGetInformation(CheckpointData, out checkpointData, XpModCacheName, logNotFound: false);
         }
 
         public static BoosterBuffs GetCurrentBoosterBuffs()

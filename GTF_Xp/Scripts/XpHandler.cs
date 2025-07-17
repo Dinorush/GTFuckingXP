@@ -1,14 +1,15 @@
-﻿using GTFuckingXP.Information.Level;
-using GTFuckingXP.Managers;
-using System;
-using UnityEngine;
-using System.Linq;
+﻿using EndskApi.Api;
+using FloatingTextAPI;
+using GTFuckingXP.Enums;
 using GTFuckingXP.Extensions;
 using GTFuckingXP.Information;
+using GTFuckingXP.Information.Level;
+using GTFuckingXP.Managers;
+using Il2CppSystem.Runtime.Remoting.Messaging;
 using Player;
-using GTFuckingXP.Enums;
-using EndskApi.Api;
-using FloatingTextAPI;
+using System;
+using System.Linq;
+using UnityEngine;
 
 namespace GTFuckingXP.Scripts
 {
@@ -48,15 +49,9 @@ namespace GTFuckingXP.Scripts
         {
             if(CacheApiWrapper.TryGetXpStorageData(out var checkpointXpData))
             {
-                LogManager.Message("Found old xp storage data!");
                 //Old level layout may be changed because of xp dev tools or other future plans :)
                 CacheApiWrapper.SetCurrentLevelLayout(checkpointXpData.levelLayout);
-
-                var level0 = checkpointXpData.levelLayout.Levels.First(it => it.LevelNumber == 0);
-                NextLevel = checkpointXpData.levelLayout.Levels.FirstOrDefault(it => it.LevelNumber == level0.LevelNumber + 1);
-                CacheApiWrapper.SetActiveLevel(level0, false);
-                CurrentTotalXp = 0;
-                AddXp(new DummyXp(checkpointXpData.totalXp, checkpointXpData.totalXp), default, false);
+                SkipToXp(checkpointXpData.totalXp);
             }
             else
             {
@@ -66,6 +61,9 @@ namespace GTFuckingXP.Scripts
                 CurrentTotalXp = 0;
                 ChangeCurrentLevel(newActiveLevel, BoosterBuffManager.Instance.GetFittingBoosterBuff(levelLayout.PersistentId, newActiveLevel.LevelNumber));
                 CacheApi.GetInstance<XpBar>(CacheApiWrapper.XpModCacheName).UpdateUiString(CacheApiWrapper.GetActiveLevel(), NextLevel, CurrentTotalXp, levelLayout.Header);
+
+                if (!SNetwork.SNet.IsMaster)
+                    NetworkApiXpManager.SendRequestXp();
             }
             _nextUpdate = Time.time + 300f;
         }
@@ -162,7 +160,18 @@ namespace GTFuckingXP.Scripts
             return false;
         }
 
-        internal void ChangeCurrentLevel(Level newLevel, BoosterBuffs newBoosterBuff = null)
+        internal void SkipToXp(uint totalXp)
+        {
+            var levelLayout = CacheApiWrapper.GetCurrentLevelLayout();
+            CurrentTotalXp = totalXp;
+            var level = levelLayout.Levels.OrderByDescending(it => it.LevelNumber).First(it => it.TotalXpRequired <= CurrentTotalXp);
+            NextLevel = levelLayout.Levels.FirstOrDefault(it => it.LevelNumber == level.LevelNumber + 1);
+            var boosterBuffs = BoosterBuffManager.Instance.GetFittingBoosterBuff(levelLayout.PersistentId, level.LevelNumber);
+            ChangeCurrentLevel(level, boosterBuffs, applyLevelBonuses: false);
+            CacheApi.GetInstance<XpBar>(CacheApiWrapper.XpModCacheName).UpdateUiString(CacheApiWrapper.GetActiveLevel(), NextLevel, CurrentTotalXp, levelLayout.Header);
+        }
+
+        internal void ChangeCurrentLevel(Level newLevel, BoosterBuffs newBoosterBuff = null, bool applyLevelBonuses = true)
         {
             CacheApiWrapper.SetActiveLevel(newLevel);
             CacheApiWrapper.SetCurrentBoosterBuff(newBoosterBuff);
@@ -177,14 +186,15 @@ namespace GTFuckingXP.Scripts
             var newMaxHealth = CacheApiWrapper.GetDefaultMaxHp() * newLevel.HealthMultiplier;
 
             localDamage.HealthMax = newMaxHealth;
-            localDamage.Health += newMaxHealth - oldMaxHealth;
+            if (applyLevelBonuses)
+                localDamage.Health += newMaxHealth - oldMaxHealth;
 
             localDamage.Cast<Dam_PlayerDamageLocal>().UpdateHealthGui();
 
-            ApplySingleUseBuffs(newLevel);
+            if (applyLevelBonuses)
+                ApplySingleUseBuffs(newLevel);
             LogManager.Debug("Pre applying custom scaling effects.");
             CustomScalingBuffManager.ApplyCustomScalingEffects(PlayerManager.GetLocalPlayerAgent(), newLevel.CustomScaling);
-            
         }
 
         private void ApplySingleUseBuffs(Level reachedLevel)

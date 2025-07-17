@@ -8,6 +8,7 @@ namespace EndskApi.Api
     public static class CheckpointApi
     {
         private const string CheckpointReachedKey = "CheckpointReachedKey";
+        private const string CheckpointReloadedKey = "CheckpointReloadedKey";
         private const string CleanupCheckpointKey = "CheckpointCleanupKey";
 
         static CheckpointApi()
@@ -22,10 +23,25 @@ namespace EndskApi.Api
         /// <param name="callBack">The callback that should be invoked whenever a checkpoint got reached.</param>
         public static void AddCheckpointReachedCallback(Action callBack)
         {
-            if(!CacheApi.TryGetInformation<List<Action>>(CheckpointReachedKey,out var callBackList, CacheApi.InternalCache, false))
+            if (!CacheApi.TryGetInformation<List<Action>>(CheckpointReachedKey,out var callBackList, CacheApi.InternalCache, false))
             {
                 callBackList = new List<Action>();
                 CacheApi.SaveInformation(CheckpointReachedKey, callBackList, CacheApi.InternalCache);
+            }
+
+            callBackList.Add(callBack);
+        }
+
+        /// <summary>
+        /// Adds <paramref name="callBack"/> to be called whenever a checkpoint was loaded.
+        /// </summary>
+        /// <param name="callBack">The callback that should be invoked whenever a checkpoint got reached.</param>
+        public static void AddCheckpointReloadedCallback(Action callBack)
+        {
+            if (!CacheApi.TryGetInformation<List<Action>>(CheckpointReloadedKey, out var callBackList, CacheApi.InternalCache, false))
+            {
+                callBackList = new List<Action>();
+                CacheApi.SaveInformation(CheckpointReloadedKey, callBackList, CacheApi.InternalCache);
             }
 
             callBackList.Add(callBack);
@@ -58,6 +74,17 @@ namespace EndskApi.Api
         }
 
         /// <summary>
+        /// Removes <paramref name="callBack"/> from the list that gets called on checkpoint reloaded.
+        /// </summary>
+        public static void RemoveCheckpointReloadedCallback(Action callBack)
+        {
+            if (CacheApi.TryGetInformation<List<Action>>(CheckpointReloadedKey, out var callBackList, CacheApi.InternalCache, false))
+            {
+                callBackList.Remove(callBack);
+            }
+        }
+
+        /// <summary>
         /// Removes <paramref name="callBack"/> from the list that gets called on checkpoint cleanup
         /// </summary>
         public static void RemoveCheckpointCleanupCallback(Action callBack)
@@ -72,7 +99,18 @@ namespace EndskApi.Api
         {
             if (CacheApi.TryGetInformation<List<Action>>(CheckpointReachedKey, out var callBackList, CacheApi.InternalCache, false))
             {
-                foreach(var callBack in callBackList)
+                foreach (var callBack in callBackList)
+                {
+                    callBack.Invoke();
+                }
+            }
+        }
+
+        internal static void InvokeCheckpointReloadedCallbacks()
+        {
+            if (CacheApi.TryGetInformation<List<Action>>(CheckpointReloadedKey, out var callBackList, CacheApi.InternalCache, false))
+            {
+                foreach (var callBack in callBackList)
                 {
                     callBack.Invoke();
                 }
