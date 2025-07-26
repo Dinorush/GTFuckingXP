@@ -29,6 +29,7 @@ namespace EndskApi.Patches.Checkpoint
         [HarmonyPostfix]
         public static void OnLevelCleanupPostfix()
         {
+            _lastCheckpointPos = Vector3.zero;
             CheckpointApi.InvokeCheckpointCleanupCallbacks();
             NetworkManager.SendCheckpointCleanups();
         }
