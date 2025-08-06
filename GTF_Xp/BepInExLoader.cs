@@ -27,7 +27,7 @@ namespace GTFuckingXP
         MODNAME = "GTFuckingXP",
         AUTHOR = "Endskill",
         GUID = AUTHOR + "." + MODNAME,
-        VERSION = "2.4.7";
+        VERSION = "2.4.8";
 
         public static bool RundownDevMode { get; private set; }
         public static ConfigEntry<bool> DebugMessages { get; private set; }
@@ -106,6 +106,7 @@ namespace GTFuckingXP
                 Harmony.PatchAll(typeof(PlaceNavMarkerOnGoPatches));
             Harmony.PatchAll(typeof(SnetSessionHubPatches));
             Harmony.PatchAll(typeof(PlayerRegenPatches));
+            Harmony.PatchAll(typeof(FogTurbinePatches));
         }
 
         private void TermsOfUsageChanged(object sender, EventArgs e)
