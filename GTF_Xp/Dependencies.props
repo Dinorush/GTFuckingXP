@@ -38,6 +38,7 @@
 	<!-- Plugin Dependencies -->
 	<ItemGroup>
 		<Reference Include="$(PluginsFolder)\GTFO-API.dll" Private="false" />
+		<Reference Include="$(PluginsFolder)\**\MTFO.dll" Private="false" />
 		<Reference Include="$(PluginsFolder)\**\FloatingTextAPI.dll" Private="false" />
 		<Reference Include="$(PluginsFolder)\**\MovementSpeedAPI.dll" Private="false" />
 	</ItemGroup>

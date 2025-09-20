@@ -29,5 +29,14 @@ namespace GTFuckingXP.Information.ClassSelector
         /// Gets or sets the name this group should run under.
         /// </summary>
         public string Name { get; set; }
+
+        public bool AllowedForCount(int playerCount)
+        {
+            if (playerCount == 0) return true; // E.g. can happen on game load. Always allow until given valid value 
+
+            if (VisibleForPlayerCount == null) return false;
+            
+            return VisibleForPlayerCount.Contains(playerCount) || (ExpandAboveFourCount && VisibleForPlayerCount.Max() >= 4);
+        }
     }
 }

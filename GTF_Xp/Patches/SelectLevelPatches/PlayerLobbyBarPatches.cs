@@ -141,7 +141,7 @@ namespace GTFuckingXP.Patches.SelectLevelPatches
 
             var contentItems = new Il2CppSystem.Collections.Generic.List<iScrollWindowContent>();
             var levelLayouts = CacheApi.GetInstance<List<LevelLayout>>(CacheApiWrapper.XpModCacheName);
-            var activeLayout = CacheApiWrapper.GetCurrentLevelLayout();
+            var activeID = CacheApiWrapper.TryGetCurrentLevelLayout(out var currentLayout) ? currentLayout.PersistentId : 0;
 
             var infoBox = lobbyBar.m_popupScrollWindow.InfoBox;
             var unusedIconSpaceY = infoBox.m_infoMainIcon.size.y;
@@ -164,7 +164,7 @@ namespace GTFuckingXP.Patches.SelectLevelPatches
                     content.m_descText.text = "";
                     content.m_subTitleText.text = "";
                     
-                    if(layout.PersistentId == activeLayout.PersistentId)
+                    if(layout.PersistentId == activeID)
                     {
                         selected = content;
                         selected.IsSelected = true;
@@ -186,6 +186,7 @@ namespace GTFuckingXP.Patches.SelectLevelPatches
 
                         infoBox.SetInfoBox(layout.Header, "", layout.InfoText, "", "", new UnityEngine.Sprite());
                         CacheApiWrapper.SetCurrentLevelLayout(layout);
+                        SaveManager.SaveLayout(layout);
                     }));
 
                     content.m_alphaSpriteOnHover = true;
@@ -229,27 +230,22 @@ namespace GTFuckingXP.Patches.SelectLevelPatches
         {
             int counter = 0;
             var currentPlayerCount = SNet.SessionHub.PlayersInSession.Count;
-            bool addedAtleastOneWithNewSystem = false;
             foreach (var group in groups)
             {
-                if (counter <= 5)
+                if (counter <= 5 && group.AllowedForCount(currentPlayerCount))
                 {
-                    if (group.VisibleForPlayerCount != null && group.VisibleForPlayerCount.Contains(currentPlayerCount))
-                    {
-                        lobbyBar.m_popupScrollWindow.AddHeader(group.Name, group.PersistentId,
-                           (Action<int>)((int headerIndex) =>
-                           {
-                               LogManager.Debug($"Header select call. HeaderIndex was {headerIndex}, or {group.PersistentId}");
-                               ChangeClassHeader(group.Name, group.PersistentId, lobbyBar);
-                           }));
+                    lobbyBar.m_popupScrollWindow.AddHeader(group.Name, group.PersistentId,
+                        (Action<int>)((int headerIndex) =>
+                        {
+                            LogManager.Debug($"Header select call. HeaderIndex was {headerIndex}, or {group.PersistentId}");
+                            ChangeClassHeader(group.Name, group.PersistentId, lobbyBar);
+                        }));
 
-                        addedAtleastOneWithNewSystem = true;
-                        counter++;
-                    }
+                    counter++;
                 }
             }
 
-            if (addedAtleastOneWithNewSystem)
+            if (counter > 0)
                 return;
 
             var group0 = groups.FirstOrDefault(it => it.PersistentId == 0);

@@ -154,13 +154,10 @@ namespace GTFuckingXP.Communication
         {
             try
             {
-                bool returnBool = true;
-
                 CacheApiWrapper.SetCurrentLevelLayout(newActiveLevelLayout);
                 if (CacheApi.TryGetInstance<XpHandler>(out var xpHandler, CacheApiWrapper.XpModCacheName))
                 {
-                    var oldTotalXp = xpHandler.CurrentTotalXp;
-                    returnBool = SetCurrentLevel(0, out _) && SetCurrentTotalXp(oldTotalXp, out _);
+                    xpHandler.SkipToXp(xpHandler.CurrentTotalXp);
                 }
 
                 return true;

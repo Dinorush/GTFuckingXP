@@ -1,4 +1,5 @@
 ﻿using EndskApi.Api;
+using GTFuckingXP.Information.ClassSelector;
 using GTFuckingXP.Information.Level;
 using GTFuckingXP.Managers;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace GTFuckingXP.Extensions
         private const string AnchorDifferenceKey = "AnchorDifferenceKey";
         private const string LvlUpCallbackKey = "LvlUpCallbackKey";
         private const string ScriptsStartedCallbackKey = "ScriptsStartedCallback";
+        private static readonly Dictionary<int, LevelLayout> DefaultLayouts = new();
 
         /// <summary>
         /// Creates a new component of type <typeparamref name="Tscript"/> and saves it into the cache.
@@ -75,6 +77,39 @@ namespace GTFuckingXP.Extensions
                 UnityEngine.Object.Destroy(script);
                 CacheApi.RemoveInstance<Tscript>(XpModCacheName);
             }
+        }
+
+        public static LevelLayout LoadOrGetDefaultLayout()
+        {
+            if (SaveManager.TryLoadLayout(out var layout))
+                return layout;
+            return GetDefaultLayout();
+        }
+
+        public static LevelLayout GetDefaultLayout()
+        {
+            int playerCount = SNetwork.SNet.SessionHub.PlayersInSession.Count;
+            if (DefaultLayouts.TryGetValue(playerCount, out var layout))
+                return layout;
+
+            var layouts = CacheApi.GetInstance<List<LevelLayout>>(XpModCacheName);
+            if (playerCount == 0)
+                return DefaultLayouts[playerCount] = layouts[0];
+                
+            var groups = CacheApi.GetInstance<List<Group>>(XpModCacheName);
+            Group bestGroup = groups[0];
+            int bestCount = bestGroup.VisibleForPlayerCount.Max();
+            foreach (var group in groups)
+            {
+                if (group.AllowedForCount(playerCount) && group.VisibleForPlayerCount.Max() < bestCount)
+                {
+                    bestGroup = group;
+                    bestCount = group.VisibleForPlayerCount.Max();
+                    if (bestCount == playerCount) break;
+                }
+            }
+
+            return DefaultLayouts[playerCount] = layouts.Find(layout => layout.GroupPersistentId == bestGroup.PersistentId)!;
         }
 
         public static void SetCurrentLevelLayout(LevelLayout levelLayout)

@@ -76,14 +76,11 @@ namespace GTFuckingXP.Managers
            
             CacheApiWrapper.SetDefaultMaxHp(PlayerDataBlock.GetBlock(1).health);
             
-            if(MtfoUtils.PluginExists)
-            {
-                _folderPath = Path.Combine(MtfoUtils.CustomPath, "GtfXP");
-            }
+            _folderPath = Path.Combine(MTFO.API.MTFOPathAPI.CustomPath, "GtfXP");
 
-            if(!_folderPath.Contains("BepInEx"))
+            if(!MTFO.API.MTFOPathAPI.HasCustomPath)
             {
-                LogManager.Warn("No MTFO was found, using assembly path...");
+                LogManager.Warn("No custom MTFO folder found, using assembly path...");
                 _folderPath = Path.Combine(BepInEx.Paths.PluginPath, "XpJson");
             }
 
@@ -91,7 +88,8 @@ namespace GTFuckingXP.Managers
             UpdateEverything();
             EnemyKillManager.Setup();
 
-            CacheApiWrapper.SetCurrentLevelLayout(CacheApi.GetInstance<List<LevelLayout>>(CacheApiWrapper.XpModCacheName)[0]);
+            if (SaveManager.TryLoadLayout(out var layout))
+                CacheApiWrapper.SetCurrentLevelLayout(layout);
 
             CheckpointApi.AddCheckpointReachedCallback(CreateCheckpointData);
             CheckpointApi.AddCheckpointCleanupCallback(CheckpointsCleanup);

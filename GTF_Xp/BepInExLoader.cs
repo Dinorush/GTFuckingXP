@@ -18,6 +18,7 @@ namespace GTFuckingXP
 {
     [BepInPlugin(GUID, MODNAME, VERSION)]
     [BepInDependency("dev.gtfomodding.gtfo-api", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("com.dak.MTFO", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("Endskill.EndskApi", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.dak.FloatingTextAPI", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("Dinorush.MovementSpeedAPI", BepInDependency.DependencyFlags.HardDependency)]
@@ -27,7 +28,7 @@ namespace GTFuckingXP
         MODNAME = "GTFuckingXP",
         AUTHOR = "Endskill",
         GUID = AUTHOR + "." + MODNAME,
-        VERSION = "2.4.8";
+        VERSION = "2.4.9";
 
         public static bool RundownDevMode { get; private set; }
         public static ConfigEntry<bool> DebugMessages { get; private set; }

@@ -32,7 +32,7 @@ namespace GTFuckingXP.Patches
                 return;
             }
 
-            if((!classInGroup.ExpandAboveFourCount || classInGroup.VisibleForPlayerCount.Max() < 4) && !classInGroup.VisibleForPlayerCount.Contains(__instance.PlayersInSession.Count))
+            if(!classInGroup.AllowedForCount(__instance.PlayersInSession.Count))
             {
                 //TODO do Standard class
                 if (GameStateManager.Current.m_currentStateName == eGameStateName.Lobby)
@@ -41,7 +41,7 @@ namespace GTFuckingXP.Patches
                     {
                         if(bar.m_player.Lookup == SNet.LocalPlayer.Lookup)
                         {
-                            CacheApiWrapper.SetCurrentLevelLayout(CacheApi.GetInstance<List<LevelLayout>>(CacheApiWrapper.XpModCacheName)[0]);
+                            CacheApiWrapper.SetCurrentLevelLayout(CacheApiWrapper.GetDefaultLayout());
                             PlayerLobbyBarPatches.ShowClassesSelector(bar);
                             break;
                         }
@@ -49,7 +49,7 @@ namespace GTFuckingXP.Patches
                 }
                 else
                 {
-                    XpApi.ChangeCurrentLevelLayout(CacheApi.GetInstance<List<LevelLayout>>(CacheApiWrapper.XpModCacheName)[0]);
+                    XpApi.ChangeCurrentLevelLayout(CacheApiWrapper.GetDefaultLayout());
                 }
             }
         }

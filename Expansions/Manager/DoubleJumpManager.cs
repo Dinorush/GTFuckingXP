@@ -45,7 +45,7 @@ namespace XpExpansions.Manager
         public override void LevelReached(Level level)
         {
             LogManager.Message($"LevelReached, DoubleJump {level.ToString()}");
-
+            
             var levelLayout = GTFuckingXP.Extensions.CacheApiWrapper.GetCurrentLevelLayout();
             var data = CacheApi.GetInstance<List<DoubleJumpData>>(Extensions.CacheApiWrapper.ExtensionCacheName);
             var doubleJump = data.FirstOrDefault(it => it.LevelLayoutPersistentId == levelLayout.PersistentId);

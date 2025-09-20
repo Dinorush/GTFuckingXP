@@ -55,7 +55,12 @@ namespace GTFuckingXP.Scripts
             }
             else
             {
-                var levelLayout = CacheApiWrapper.GetCurrentLevelLayout();
+                if (!CacheApiWrapper.TryGetCurrentLevelLayout(out var levelLayout))
+                {
+                    levelLayout = CacheApiWrapper.GetDefaultLayout();
+                    CacheApiWrapper.SetCurrentLevelLayout(levelLayout);
+                }
+
                 var newActiveLevel = levelLayout.Levels.First(it => it.LevelNumber == 0);
                 NextLevel = levelLayout.Levels.FirstOrDefault(it => it.LevelNumber == newActiveLevel.LevelNumber + 1);
                 CurrentTotalXp = 0;

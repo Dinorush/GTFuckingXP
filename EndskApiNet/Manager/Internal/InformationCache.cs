@@ -22,7 +22,9 @@ namespace EndskApi.Manager.Internal
         {
             if (GetCacheOfMod(mod).TryGetValue(key, out var value))
             {
-                return (T)value;
+                if (value is not T castValue)
+                    throw new KeyNotFoundException($"Tried to get information with key {key}, but it is not type {typeof(T).Name}");
+                return castValue;
             }
 
             LogManager.Error($"There was no information with the key {key}");
@@ -33,8 +35,14 @@ namespace EndskApi.Manager.Internal
         {
             if (GetCacheOfMod(mod).TryGetValue(key, out var value))
             {
-                info = (T)value;
-                return true;
+                if (value is T castValue)
+                {
+                    info = castValue;
+                    return true;
+                }
+                LogManager.Warn($"Tried to get information with key {key}, but it is not type {typeof(T).Name}");
+                info = default;
+                return false;
             }
 
             if (logNotFound)
