@@ -11,6 +11,7 @@ using GTFuckingXP.Managers;
 using GTFuckingXP.Patches;
 using GTFuckingXP.Patches.SelectLevelPatches;
 using GTFuckingXP.Scripts;
+using GTFuckingXP.Dependencies;
 using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
 
@@ -22,13 +23,14 @@ namespace GTFuckingXP
     [BepInDependency("Endskill.EndskApi", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.dak.FloatingTextAPI", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("Dinorush.MovementSpeedAPI", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency(PartialData.PLUGIN_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     public class BepInExLoader : BasePlugin
     {
         public const string
         MODNAME = "GTFuckingXP",
         AUTHOR = "Endskill",
         GUID = AUTHOR + "." + MODNAME,
-        VERSION = "2.4.9";
+        VERSION = "2.4.10";
 
         public static bool RundownDevMode { get; private set; }
         public static ConfigEntry<bool> DebugMessages { get; private set; }

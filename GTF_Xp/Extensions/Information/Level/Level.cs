@@ -16,7 +16,7 @@ namespace GTFuckingXP.Information.Level
         { }
 
         public Level(int levelNumber, uint totalXp, float healthMultiplier, float meleeMultiplier, float weaponMultiplier, List<SingleUseBuff> singleUseBuffs,
-            List<CustomScalingBuff> customScaling, string customLevelUpPopupText = "", string customLevelStatsText = "")
+            List<CustomScalingBuff> customScaling, LocaleText customLevelUpPopupText = default, LocaleText customLevelStatsText = default)
         {
             LevelNumber = levelNumber;
             TotalXpRequired = totalXp;

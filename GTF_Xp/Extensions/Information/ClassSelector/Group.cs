@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.Json;
+﻿using GTFuckingXP.Extensions.Information.Level.Json;
 
 namespace GTFuckingXP.Information.ClassSelector
 {
@@ -28,7 +27,7 @@ namespace GTFuckingXP.Information.ClassSelector
         /// <summary>
         /// Gets or sets the name this group should run under.
         /// </summary>
-        public string Name { get; set; }
+        public LocaleText Name { get; set; }
 
         public bool AllowedForCount(int playerCount)
         {

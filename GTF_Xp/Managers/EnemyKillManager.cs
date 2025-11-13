@@ -30,7 +30,7 @@ namespace GTFuckingXp.Managers
             position.y += 1f;
             foreach (var player in SNet.LobbyPlayers)
             {
-                if(!player.IsBot)
+                if(player != null && !player.IsBot)
                 {
                     if(info.LastHitDealtBy.Owner.PlayerSlot.index == player.PlayerSlot.index)
                     {

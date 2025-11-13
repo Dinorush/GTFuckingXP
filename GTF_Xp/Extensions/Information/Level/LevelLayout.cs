@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GTFuckingXP.Extensions.Information.Level.Json;
+using System.Collections.Generic;
 
 namespace GTFuckingXP.Information.Level
 {
@@ -7,7 +8,7 @@ namespace GTFuckingXP.Information.Level
     /// </summary>
     public class LevelLayout
     {
-        public LevelLayout(int persistentId, string header, int groupPersistentId, string infoText, List<Level> levels)
+        public LevelLayout(int persistentId, LocaleText header, int groupPersistentId, LocaleText infoText, List<Level> levels)
         {
             PersistentId = persistentId;
             GroupPersistentId = groupPersistentId;
@@ -19,7 +20,7 @@ namespace GTFuckingXP.Information.Level
         /// <summary>
         /// Gets or sets the id leading to that 
         /// </summary>
-        public string Header { get; set; }
+        public LocaleText Header { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the header, that is used in the scrollwindow of the loadoutpage.
@@ -34,7 +35,7 @@ namespace GTFuckingXP.Information.Level
         /// <summary>
         /// Gets or sets the info text for this class.
         /// </summary>
-        public string InfoText { get; set; }
+        public LocaleText InfoText { get; set; }
 
         ///// <summary>
         ///// Gets or sets all constant booster effects that does gets applied, when this <see cref="LevelLayout"/> is chosen.
