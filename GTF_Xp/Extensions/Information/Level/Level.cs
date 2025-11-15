@@ -44,12 +44,12 @@ namespace GTFuckingXP.Information.Level
         /// <summary>
         /// Gets or sets the custom level reached popup text.
         /// </summary>
-        public string CustomLevelUpPopupText { get; set; }
+        public LocaleText CustomLevelUpPopupText { get; set; }
 
         /// <summary>
         /// Gets or sets the custom levelstats the player sees at the bottom right ingame.
         /// </summary>
-        public string CustomLevelStatsText { get; set; }
+        public LocaleText CustomLevelStatsText { get; set; }
 
         /// <summary>
         /// Gets or sets the amount the basic hp get scaled with this value.
