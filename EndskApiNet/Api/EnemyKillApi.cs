@@ -15,6 +15,7 @@ namespace EndskApi.Api
         private static bool _setup = false;
 
         private static Dictionary<IntPtr, bool> _enemyStates = new Dictionary<IntPtr, bool>();
+        private static Dictionary<IntPtr, EnemyKillDistribution> _enemyDistributions = new Dictionary<IntPtr, EnemyKillDistribution>();
 
         /// <summary>
         /// Adds a callback to whenever an enemy dies.
@@ -54,12 +55,11 @@ namespace EndskApi.Api
                 EnemyDamageBasePatchApi.AddReceiveBulletPostfix(1, ReceiveBulletPostfix);
                 EnemyDamageBasePatchApi.AddReceiveExplosionPrefix(1, ReceiveExplosionPrefix);
                 EnemyDamageBasePatchApi.AddReceiveExplosionPostfix(1, ReceiveExplosionPostfix);
-                CacheApi.SaveInstance(new Dictionary<IntPtr, EnemyKillDistribution>(), CacheApi.InternalCache);
 
                 EndskApi.Api.LevelApi.AddEndLevelCallback(() =>
                 {
-                    _enemyStates = new Dictionary<IntPtr, bool>();
-                    CacheApi.SaveInstance(new Dictionary<IntPtr, EnemyKillDistribution>(), CacheApi.InternalCache);
+                    _enemyStates.Clear();
+                    _enemyDistributions.Clear();
                 });
 
                 _setup = true;
@@ -68,13 +68,13 @@ namespace EndskApi.Api
 
         private static void ReceiveMeleePrefix(Dam_EnemyDamageBase instance, ref pFullDamageData data)
         {
-            LogManager.Debug($"Receive Melee EnemyKillApi Prefix State = {instance.Owner.Alive}");
-            _enemyStates[instance.Pointer] = instance.Owner.Alive;
+            var alive = instance.Owner.Alive;
+            if (alive || _enemyStates.ContainsKey(instance.Pointer))
+                _enemyStates[instance.Pointer] = alive;
         }
 
         private static void ReceiveMeleePostfix(Dam_EnemyDamageBase instance, ref pFullDamageData data)
         {
-            LogManager.Debug($"Receive Melee EnemyKillApi Postfix State = {instance.Owner.Alive}");
             if (_enemyStates.TryGetValue(instance.Pointer, out var state) && state)
             {
                 data.source.TryGet(out var agent);
@@ -94,7 +94,9 @@ namespace EndskApi.Api
 
         private static void ReceiveBulletPrefix(Dam_EnemyDamageBase instance, ref pBulletDamageData data)
         {
-            _enemyStates[instance.Pointer] = instance.Owner.Alive;
+            var alive = instance.Owner.Alive;
+            if (alive || _enemyStates.ContainsKey(instance.Pointer))
+                _enemyStates[instance.Pointer] = alive;
         }
 
         private static void ReceiveBulletPostfix(Dam_EnemyDamageBase instance, ref pBulletDamageData data)
@@ -118,7 +120,9 @@ namespace EndskApi.Api
 
         private static void ReceiveExplosionPrefix(Dam_EnemyDamageBase instance, PlayerAgent? source, ref pExplosionDamageData data)
         {
-            _enemyStates[instance.Pointer] = instance.Owner.Alive;
+            var alive = instance.Owner.Alive;
+            if (alive || _enemyStates.ContainsKey(instance.Pointer))
+                _enemyStates[instance.Pointer] = alive;
         }
 
         private static void ReceiveExplosionPostfix(Dam_EnemyDamageBase instance, PlayerAgent? source, ref pExplosionDamageData data)
@@ -139,29 +143,31 @@ namespace EndskApi.Api
 
         private static void DamageDistributionAddDamageDealt(EnemyAgent hitEnemy, PlayerAgent damageDealer, float damageDealt)
         {
-            var damageDistribution = CacheApi.GetInstance<Dictionary<IntPtr, EnemyKillDistribution>>(CacheApi.InternalCache);
-
-            if (!damageDistribution.ContainsKey(hitEnemy.Pointer))
-            {
-                var distribution = new EnemyKillDistribution(hitEnemy);
-                distribution.AddDamageDealtByPlayerAgent(damageDealer, damageDealt);
-                damageDistribution[hitEnemy.Pointer] = distribution;
-                return;
-            }
-
-            damageDistribution[hitEnemy.Pointer].AddDamageDealtByPlayerAgent(damageDealer, damageDealt);
+            if (!_enemyDistributions.TryGetValue(hitEnemy.Pointer, out var distribution))
+                _enemyDistributions.Add(hitEnemy.Pointer, distribution = new(hitEnemy));
+            distribution.AddDamageDealtByPlayerAgent(damageDealer, damageDealt);
         }
 
-        private static void EnemyDied(EnemyAgent hitEnemy, PlayerAgent lastHit, LastHitType lastHitType)
+        private static void EnemyDied(EnemyAgent hitEnemy, PlayerAgent? lastHit, LastHitType lastHitType)
         {
-            var damageDistribution = CacheApi.GetInstance<Dictionary<IntPtr, EnemyKillDistribution>>(CacheApi.InternalCache);
-            if (damageDistribution.TryGetValue(hitEnemy.Pointer, out EnemyKillDistribution distribution))
+            if (_enemyDistributions.TryGetValue(hitEnemy.Pointer, out var distribution))
             {
                 distribution.LastHitDealtBy = lastHit;
                 distribution.lastHitType = lastHitType;
 
                 EnemyKillApi.InvokeEnemyKilledCallbacks(distribution);
+                _enemyDistributions.Remove(hitEnemy.Pointer);
             }
+
+            _enemyStates.Remove(hitEnemy.Pointer);
+        }
+
+        public static void RegisterDamage(EnemyAgent enemy, PlayerAgent? source, float damage, bool willKill)
+        {
+            if (source != null)
+                DamageDistributionAddDamageDealt(enemy, source, damage);
+            if (willKill)
+                EnemyDied(enemy, source, LastHitType.ShootyWeapon);
         }
     }
 }

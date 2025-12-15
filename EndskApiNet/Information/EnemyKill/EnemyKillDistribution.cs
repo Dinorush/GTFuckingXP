@@ -13,23 +13,29 @@ namespace EndskApi.Information.EnemyKill
         public EnemyKillDistribution(EnemyAgent agentToKill)
         {
             KilledEnemyAgent = agentToKill;
-            DamageDistributions = new List<DamageDistribution>();
+            DamageDistributions = new();
         }
 
         public EnemyAgent KilledEnemyAgent { get; set; }
-        public List<DamageDistribution> DamageDistributions { get; set; }
-        public PlayerAgent LastHitDealtBy { get; set; }
+        public Dictionary<int, float> DamageDistributions { get; set; }
+        public PlayerAgent? LastHitDealtBy { get; set; }
         public LastHitType lastHitType { get; set; }
 
         public void AddDamageDealtByPlayerAgent(PlayerAgent agent, float damage)
         {
-            DamageDistributions.Add(new DamageDistribution(agent.PlayerSlotIndex, damage));
+            if (!DamageDistributions.TryGetValue(agent.PlayerSlotIndex, out var currDamage))
+                DamageDistributions.Add(agent.PlayerSlotIndex, damage);
+            else
+                DamageDistributions[agent.PlayerSlotIndex] = currDamage + damage;
         }
 
         public float GetDamageDealtBySnet(SNet_Player player)
         {
             var slotIndex = player.PlayerSlotIndex();
-            return DamageDistributions.Where(it => it.PlayerSlotIndex == slotIndex).Sum(it => it.DamageDealt);
+            if (DamageDistributions.TryGetValue(slotIndex, out var damage))
+                return damage;
+            else
+                return 0;
         }
     }
 
