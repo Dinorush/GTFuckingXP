@@ -42,7 +42,6 @@
 		<Reference Include="$(PluginsFolder)\**\FloatingTextAPI.dll" Private="false" />
 		<Reference Include="$(PluginsFolder)\**\ModifierAPI.dll" Private="false" />
 		<Reference Include="$(PluginsFolder)\**\MTFO.Ext.PartialData.dll" Private="false" />
-		<Reference Include="$(PluginsFolder)\**\MeleeSwingCustomization.dll" Private="false" />
 	</ItemGroup>
 
 	<!-- NuGet Packages -->
