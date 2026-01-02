@@ -2,8 +2,8 @@
 using GTFuckingXP.Enums;
 using GTFuckingXP.Extensions;
 using GTFuckingXP.Information.Level;
-using MovementSpeedAPI;
 using Player;
+using ModifierAPI;
 
 namespace GTFuckingXP.Managers
 {
@@ -61,7 +61,7 @@ namespace GTFuckingXP.Managers
                     meleeData.AttackSphereRadius = meleeHitbox * value;
                     break;
                 case CustomScaling.MovementSpeedMultiplier:
-                    if (!CacheApiWrapper.TryGetDefaultCustomScaling(customBuff, out ISpeedModifier speedModifier))
+                    if (!CacheApiWrapper.TryGetDefaultCustomScaling(customBuff, out IStatModifier speedModifier))
                     {
                         if (value == 1f) break;
 
@@ -75,6 +75,23 @@ namespace GTFuckingXP.Managers
                     else
                     {
                         speedModifier.Enable(value);
+                    }
+                    break;
+                case CustomScaling.MeleeAttackSpeedMultiplier:
+                    if (!CacheApiWrapper.TryGetDefaultCustomScaling(customBuff, out IStatModifier attackSpeedModifier))
+                    {
+                        if (value == 1f) break;
+
+                        attackSpeedModifier = MeleeAttackSpeedAPI.AddModifier(value);
+                        CacheApiWrapper.SetDefaultCustomScaling(customBuff, attackSpeedModifier);
+                    }
+                    else if (value == 1f)
+                    {
+                        attackSpeedModifier.Disable();
+                    }
+                    else
+                    {
+                        attackSpeedModifier.Enable(value);
                     }
                     break;
                 //case CustomScaling.AntiFogSphere:

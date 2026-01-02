@@ -5,6 +5,7 @@
         Invalid = -1,
         MeleeRangeMultiplier,
         MeleeHitBoxSizeMultiplier,
+        MeleeAttackSpeedMultiplier,
         MovementSpeedMultiplier,
         //AntiFogSphere,
         JumpVelInitialPlus,

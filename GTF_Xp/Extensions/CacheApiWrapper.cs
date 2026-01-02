@@ -252,7 +252,7 @@ namespace GTFuckingXP.Extensions
 
         public static bool TryGetDefaultCustomScaling<T>(Enums.CustomScaling customScaling, out T info)
         {
-            return CacheApi.TryGetInformation(customScaling, out info, XpModCacheName);
+            return CacheApi.TryGetInformation(customScaling, out info, XpModCacheName, logNotFound: false);
         }
 
         public static bool HasDefaultCustomScaling(Enums.CustomScaling customScaling)

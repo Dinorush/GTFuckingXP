@@ -22,7 +22,7 @@ namespace GTFuckingXP
     [BepInDependency("com.dak.MTFO", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("Endskill.EndskApi", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.dak.FloatingTextAPI", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInDependency("Dinorush.MovementSpeedAPI", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("Dinorush.ModifierAPI", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency(PartialData.PLUGIN_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     public class BepInExLoader : BasePlugin
     {
