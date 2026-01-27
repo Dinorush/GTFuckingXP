@@ -327,7 +327,7 @@ namespace GTFuckingXP.Managers
             }
 
             var customScalingPath = Path.Combine(_folderPath, "CustomScaling_EnumNames.txt");
-            if (!File.Exists(agentModifierPath))
+            if (!File.Exists(customScalingPath))
             {
                 var str = new StringBuilder();
                 str.AppendLine("--This file is auto-generated. It's not for editing!--");
@@ -337,6 +337,19 @@ namespace GTFuckingXP.Managers
                     str.AppendLine(mod.ToString());
                 }
                 File.WriteAllText(customScalingPath, str.ToString());
+            }
+
+            var startingBuffsPath = Path.Combine(_folderPath, "StartingBuffs_EnumNames.txt");
+            if (!File.Exists(startingBuffsPath))
+            {
+                var str = new StringBuilder();
+                str.AppendLine("--This file is auto-generated. It's not for editing!--");
+                str.AppendLine();
+                foreach (var mod in Enum.GetValues(typeof(StartBuff)))
+                {
+                    str.AppendLine(mod.ToString());
+                }
+                File.WriteAllText(startingBuffsPath, str.ToString());
             }
             #endregion
         }
