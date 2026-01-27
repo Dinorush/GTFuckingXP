@@ -8,6 +8,7 @@ using GTFuckingXP.Scripts;
 using Player;
 using SNetwork;
 using System.Text.Json;
+using Enemies;
 using UnityEngine;
 
 namespace GTFuckingXP.Managers
@@ -26,7 +27,8 @@ namespace GTFuckingXP.Managers
         private const string _levelStatsDistribution = "ReachedSentLevel_XP";
         private const string _receiveStaticXp = "XpModTriesToGiveYouSomeHalfAssedXP";
         private const string _undistributedXp = "XpModGivesYouSomeXpWhereYouHadNotToDoAnything";
-        private const string _sendBoosterNetworkString = "MyNewBoostersEffectFromTheXpMod";       
+        private const string _sendBoosterNetworkString = "MyNewBoostersEffectFromTheXpMod";
+        public static string SendPlayerBiotrackTagged = "XpModPlayerBiotrackerTaggedEnemies";
 
         public static void Setup()
         {
@@ -37,6 +39,7 @@ namespace GTFuckingXP.Managers
             NetworkAPI.RegisterEvent<GtfoApiXpInfo>(_undistributedXp, ReceiveHalfAssedXp);
             NetworkAPI.RegisterEvent<InitXpInfo>(_initXpString, ReceiveInitXp);
             NetworkAPI.RegisterEvent<bool>(_requestXpString, ReceiveRequestXp);
+            NetworkAPI.RegisterEvent<BiotrackerTags>(SendPlayerBiotrackTagged, ReceiveBiotrackerTagEvent);
             CheckpointApi.AddCheckpointReachedCallback(OnCheckpointReached);
             CheckpointApi.AddCheckpointReloadedCallback(OnCheckpointReloaded);
             LevelAPI.OnLevelCleanup += OnLevelCleanup;
@@ -141,6 +144,25 @@ namespace GTFuckingXP.Managers
                     if (player.PlayerSlotIndex == snet.PlayerSlotIndex())
                     {
                         BoosterBuffManager.Instance.ApplyBoosterEffects(player, newInfo);
+                    }
+                }
+            }
+        }
+
+        internal static void ReceiveBiotrackerTagEvent(ulong snetPlayer, BiotrackerTags taggedEnemies)
+        {
+            if (SNet.TryGetPlayer(snetPlayer, out var snet))
+            {
+                var playerAgents = PlayerManager.PlayerAgentsInLevel;
+                foreach (var player in playerAgents)
+                {
+                    if (player.PlayerSlotIndex == snet.PlayerSlotIndex())
+                    {
+                        foreach (var enemy in taggedEnemies.TaggedEnemies)
+                        {
+                            EnemyKillApi.RegisterPlayerBiotrackTagEnemy(player, enemy);
+                        }
+                        break;
                     }
                 }
             }

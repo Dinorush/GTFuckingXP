@@ -162,6 +162,13 @@ namespace EndskApi.Api
             _enemyStates.Remove(hitEnemy.Pointer);
         }
 
+        public static void RegisterPlayerBiotrackTagEnemy(PlayerAgent playerAgent, EnemyAgent taggedEnemy)
+        {
+            if (!_enemyDistributions.TryGetValue(taggedEnemy.Pointer, out var distribution))
+                _enemyDistributions.Add(taggedEnemy.Pointer, distribution = new(taggedEnemy));
+            distribution.TaggedByPlayer = playerAgent;
+        }
+
         public static void RegisterDamage(EnemyAgent enemy, PlayerAgent? source, float damage, bool willKill)
         {
             if (source != null)

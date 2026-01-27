@@ -19,6 +19,7 @@ namespace EndskApi.Information.EnemyKill
         public EnemyAgent KilledEnemyAgent { get; set; }
         public Dictionary<int, float> DamageDistributions { get; set; }
         public PlayerAgent? LastHitDealtBy { get; set; }
+        public PlayerAgent? TaggedByPlayer { get; set; }
         public LastHitType lastHitType { get; set; }
 
         public void AddDamageDealtByPlayerAgent(PlayerAgent agent, float damage)

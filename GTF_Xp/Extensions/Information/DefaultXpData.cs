@@ -42,7 +42,7 @@ namespace GTFuckingXP.Information
 
                 levelScaling = levelScaling > 0 ? levelScaling : 1;
                 enemyXpData.Add(new EnemyXp(enemy.persistentID, enemy.name,
-                    (uint)(maxHp / 2.5), (uint)(maxHp / 5), levelScaling));
+                    (uint)(maxHp / 2.5), 0.0f, (uint)(maxHp / 5), levelScaling));
             }
 
             return enemyXpData;

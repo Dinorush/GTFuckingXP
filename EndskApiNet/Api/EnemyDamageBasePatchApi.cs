@@ -13,7 +13,8 @@ namespace EndskApi.Api
         public delegate void ReceiveBulletDamage(Dam_EnemyDamageBase instance, ref pBulletDamageData data);
         public delegate void ReceiveExplosionDamage(Dam_EnemyDamageBase instance, PlayerAgent? source, ref pExplosionDamageData data);
         public delegate void ProcessReceivedDamage(Dam_EnemyDamageBase instance, ref float damage, Agent damageSource, ref Vector3 position, ref Vector3 direction, ref ES_HitreactType hitreact, ref bool tryForceHitreact, ref int limbID, ref float staggerDamageMulti, ref DamageNoiseLevel damageNoiseLevel);
-
+        public delegate void ReceiveBiotrackerTag();
+        
         internal static List<(double, ReceiveMeleeDamage)> MeleePrefixCallbacks
         {
             get => CacheApi.GetInstance<List<(double, ReceiveMeleeDamage)>>(CacheApi.InternalCache);
@@ -184,7 +185,6 @@ namespace EndskApi.Api
                 callback.Item2(instance, MineDeployerExplosivePatches.CachedAgent, ref data);
             }
         }
-
         //internal static void InvokeProcessReceivedDamagePrefix(Dam_EnemyDamageBase instance, ref float damage, Agent damageSource, ref Vector3 position, ref Vector3 direction, ref ES_HitreactType hitreact, ref bool tryForceHitreact, ref int limbID, ref float staggerDamageMulti, ref DamageNoiseLevel damageNoiseLevel)
         //{
         //    foreach (var callback in ProcessDamagePrefixCallbacks)

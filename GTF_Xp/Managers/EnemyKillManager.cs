@@ -48,14 +48,37 @@ namespace GTFuckingXp.Managers
                     }
                     else
                     {
+                        // Potential bio assist
+                        uint bioAssistXp = 0;
+                        if (info.KilledEnemyAgent.IsTagged && enemyXpData.BioAssistMultiplier > 0.0f &&
+                            info.TaggedByPlayer != null && info.TaggedByPlayer.Owner.PlayerSlot.index == player.PlayerSlot.index)
+                        {
+                            bioAssistXp = (uint) (enemyXpData.XpGain * enemyXpData.BioAssistMultiplier);
+                        }
                         var damageDealt = info.GetDamageDealtBySnet(player);
                         if (damageDealt > 0.5f)
                         {
                             var percentageDealt = damageDealt / info.KilledEnemyAgent.Damage.HealthMax;
                             LogManager.Debug($"percentageDealt = {percentageDealt} and damageDealt is {damageDealt}");
 
-                            NetworkApiXpManager.SendStaticXpInfo(player, (uint)(enemyXpData.XpGain * percentageDealt),
+                            uint xpGain = (uint)(enemyXpData.XpGain * percentageDealt);
+                            // If we gained more xp from the biotracker assist, use that instead
+                            if (bioAssistXp > xpGain)
+                            {
+                                xpGain = bioAssistXp;
+                            }
+                            
+                            NetworkApiXpManager.SendStaticXpInfo(player, xpGain,
                                         (uint)(enemyXpData.DebuffXp * percentageDealt), (int)(enemyXpData.LevelScalingXpDecrese * percentageDealt), position);
+                        }
+                        else
+                        {
+                            // If we didn't deal any damage, but we had assist xp, send that.
+                            if (bioAssistXp > 0)
+                            {
+                                NetworkApiXpManager.SendStaticXpInfo(player, bioAssistXp,
+                                    (uint)(enemyXpData.DebuffXp * enemyXpData.BioAssistMultiplier), (int)(enemyXpData.LevelScalingXpDecrese * enemyXpData.BioAssistMultiplier), position);
+                            }
                         }
                     }
                 }
@@ -83,7 +106,7 @@ namespace GTFuckingXp.Managers
             {
                 //No data found, creating a new instance and 
                 LogManager.Warn($"There was no enemy XP data found for {killedEnemy.EnemyDataID}!");
-                enemyXpData = new EnemyXp(killedEnemy.EnemyDataID, killedEnemy.name, 0, 0, 0);
+                enemyXpData = new EnemyXp(killedEnemy.EnemyDataID, killedEnemy.name, 0, 0.0f, 0, 0);
                 enemyData.Add(enemyXpData);
                 CacheApi.SaveInstance(enemyData, CacheApiWrapper.XpModCacheName);
             }

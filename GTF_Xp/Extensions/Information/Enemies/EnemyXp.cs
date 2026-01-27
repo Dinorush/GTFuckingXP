@@ -7,13 +7,14 @@
     {
         public EnemyXp()
         { }
-        public EnemyXp(uint enemyId, string enemyName, uint killXp, uint debuffXp, int levelScalingXpDecrease)
+        public EnemyXp(uint enemyId, string enemyName, uint killXp, float bioAssistMultiplier, uint debuffXp, int levelScalingXpDecrease)
         {
             EnemyId = enemyId;
             EnemyName = enemyName;
             XpGain = killXp;
             DebuffXp = debuffXp;
             LevelScalingXpDecrese = levelScalingXpDecrease;
+            BioAssistMultiplier = bioAssistMultiplier;
         }
 
         /// <summary>
@@ -35,6 +36,11 @@
         /// Gets or sets the xp gained by killing the enemy with the id <see cref="EnemyId"/> while being in a debuff phase.
         /// </summary>
         public uint DebuffXp { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the xp percentage to amount gained from biotracking an enemy before it is killed.
+        /// </summary>
+        public float BioAssistMultiplier { get; set; }
 
         /// <summary>
         /// Gets or sets the amount of xp that get subtracted each level you currently are.
