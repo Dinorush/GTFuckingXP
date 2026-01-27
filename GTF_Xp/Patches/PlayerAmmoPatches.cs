@@ -12,7 +12,7 @@ namespace GTFuckingXP.Patches
         [HarmonyPatch(nameof(PlayerAmmoStorage.AddLevelDefaultAmmoModifications))]
         [HarmonyWrapSafe]
         [HarmonyPostfix]
-        private static void Pre_SetStorage(PlayerAmmoStorage __instance, PlayerAgent owner)
+        private static void Post_SetStorage(PlayerAmmoStorage __instance, PlayerAgent owner)
         {
             if (RundownManager.ActiveExpedition == null || !owner.IsLocallyOwned || !CacheApiWrapper.TryGetCurrentLevelLayout(out var layout)) return;
 
@@ -38,7 +38,11 @@ namespace GTFuckingXP.Patches
             var idArr = __instance.m_ammoModificationIDs;
             var specialOverride = RundownManager.ActiveExpedition.SpecialOverrideData;
 
-            AgentModifierManager.TryGetModifierInstance(owner, out var modifierInstance);
+            if (!AgentModifierManager.TryGetModifierInstance(owner, out var modifierInstance))
+            {
+                AgentModifierManager.AddModifierValue(owner, AgentModifier.InitialAmmoStandard, 0);
+                AgentModifierManager.TryGetModifierInstance(owner, out modifierInstance);
+            }
 
             float oldMod = modifierInstance.GetModifierValue(AgentModifier.InitialAmmoStandard) + 1;
             AgentModifierManager.ClearModifierChange(idArr[0]);
