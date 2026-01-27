@@ -14,7 +14,7 @@ namespace GTFuckingXP.Patches
         [HarmonyPostfix]
         private static void Post_SetStorage(PlayerAmmoStorage __instance, PlayerAgent owner)
         {
-            if (RundownManager.ActiveExpedition == null || !owner.IsLocallyOwned || !CacheApiWrapper.TryGetCurrentLevelLayout(out var layout)) return;
+            if (RundownManager.ActiveExpedition == null || !owner.IsLocallyOwned || !CacheApiWrapper.TryGetCurrentLevelLayout(out var layout) || layout.StartingBuffs == null) return;
 
             float[] mods = new float[]{ 1f, 1f, 1f };
             foreach (var startingBuff in layout.StartingBuffs)

@@ -44,7 +44,7 @@ namespace GTFuckingXP.Information.Level
         ///// </summary>
         //public Dictionary<AgentModifier, float> ConstantBoosterEffects { get; set; }
 
-        public List<StartingBuff> StartingBuffs { get; set; } = new();
+        public List<StartingBuff>? StartingBuffs { get; set; }
 
         /// <summary>
         /// Gets or sets all levels containing in this layout.
