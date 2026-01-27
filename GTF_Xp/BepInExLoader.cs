@@ -24,13 +24,15 @@ namespace GTFuckingXP
     [BepInDependency("com.dak.FloatingTextAPI", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("Dinorush.ModifierAPI", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency(PartialData.PLUGIN_GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(AmmoFix.SSA_GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(AmmoFix.ETC_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     public class BepInExLoader : BasePlugin
     {
         public const string
         MODNAME = "GTFuckingXP",
         AUTHOR = "Endskill",
         GUID = AUTHOR + "." + MODNAME,
-        VERSION = "2.4.12";
+        VERSION = "2.5.0";
 
         public static bool RundownDevMode { get; private set; }
         public static ConfigEntry<bool> DebugMessages { get; private set; }
@@ -110,6 +112,8 @@ namespace GTFuckingXP
             Harmony.PatchAll(typeof(SnetSessionHubPatches));
             Harmony.PatchAll(typeof(PlayerRegenPatches));
             Harmony.PatchAll(typeof(FogTurbinePatches));
+            Harmony.PatchAll(typeof(PlayerAmmoPatches));
+            AmmoFix.TryApplyPatches(Harmony);
         }
 
         private void TermsOfUsageChanged(object sender, EventArgs e)

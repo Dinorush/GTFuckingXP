@@ -1,5 +1,5 @@
 ﻿using Agents;
-using EndskApi.Patches.EnemyKill;
+using EndskApi.Patches.Enemy;
 using Player;
 using UnityEngine;
 
@@ -68,6 +68,7 @@ namespace EndskApi.Api
             {
                 BepInExLoader.Harmony.PatchAll(typeof(EnemyDamageBasePatches));
                 BepInExLoader.Harmony.PatchAll(typeof(MineDeployerExplosivePatches));
+                BepInExLoader.Harmony.PatchAll(typeof(EnemyTagPatches));
 
                 MeleePrefixCallbacks = new List<(double, ReceiveMeleeDamage)>();
                 MeleePostfixCallbacks = new List<(double, ReceiveMeleeDamage)>();

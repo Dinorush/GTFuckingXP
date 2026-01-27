@@ -7,12 +7,13 @@
     {
         public EnemyXp()
         { }
-        public EnemyXp(uint enemyId, string enemyName, uint killXp, uint debuffXp, int levelScalingXpDecrease)
+        public EnemyXp(uint enemyId, string enemyName, uint killXp, uint debuffXp, int levelScalingXpDecrease, float biotagXpFrac = -1)
         {
             EnemyId = enemyId;
             EnemyName = enemyName;
             XpGain = killXp;
             DebuffXp = debuffXp;
+            BiotagXpFrac = biotagXpFrac;
             LevelScalingXpDecrese = levelScalingXpDecrease;
         }
 
@@ -46,5 +47,10 @@
         /// which results into 4XP
         /// </summary>
         public int LevelScalingXpDecrese { get; set; }
+
+        /// <summary>
+        /// Gets or sets the % damage floor bio tagging this enemy counts as.
+        /// </summary>
+        public float BiotagXpFrac { get; set; } = -1;
     }
 }

@@ -2,6 +2,7 @@
 using EndskApi.Information.EnemyKill;
 using Enemies;
 using GTFuckingXP.Extensions;
+using GTFuckingXP.Extensions.Information;
 using GTFuckingXP.Information.Enemies;
 using GTFuckingXP.Managers;
 using GTFuckingXP.Scripts;
@@ -49,10 +50,23 @@ namespace GTFuckingXp.Managers
                     else
                     {
                         var damageDealt = info.GetDamageDealtBySnet(player);
-                        if (damageDealt > 0.5f)
+                        var healthMax = info.KilledEnemyAgent.Damage.HealthMax;
+                        var percentageDealt = damageDealt / healthMax;
+
+                        var bioTagged = info.DidSnetBiotag(player);
+                        if (bioTagged)
                         {
-                            var percentageDealt = damageDealt / info.KilledEnemyAgent.Damage.HealthMax;
-                            LogManager.Debug($"percentageDealt = {percentageDealt} and damageDealt is {damageDealt}");
+                            float xpFrac = enemyXpData.BiotagXpFrac;
+                            if (xpFrac < 0)
+                            {
+                                xpFrac = CacheApi.GetInstance<GlobalValues>(CacheApiWrapper.XpModCacheName).BiotagXpFrac;
+                            }
+                            percentageDealt = Math.Max(percentageDealt, xpFrac);
+                        }
+                        
+                        if (damageDealt > 0.5f || bioTagged)
+                        {
+                            LogManager.Debug($"percentageDealt = {percentageDealt}, damageDealt = {damageDealt}");
 
                             NetworkApiXpManager.SendStaticXpInfo(player, (uint)(enemyXpData.XpGain * percentageDealt),
                                         (uint)(enemyXpData.DebuffXp * percentageDealt), (int)(enemyXpData.LevelScalingXpDecrese * percentageDealt), position);

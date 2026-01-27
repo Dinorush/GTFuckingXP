@@ -125,7 +125,7 @@ namespace GTFuckingXP.Extensions
 
         public static bool TryGetCurrentLevelLayout(out LevelLayout levelLayout)
         {
-            return CacheApi.TryGetInformation(LevelLayoutKey, out levelLayout, XpModCacheName);
+            return CacheApi.TryGetInformation(LevelLayoutKey, out levelLayout, XpModCacheName, logNotFound: false);
         }
 
         /// <summary>
@@ -152,6 +152,14 @@ namespace GTFuckingXP.Extensions
         public static Level GetActiveLevel()
         {
             return CacheApi.GetInformation<Level>(ActiveLevelKey, XpModCacheName);
+        }
+
+        public static Level? GetActiveLevel(Player.PlayerAgent player)
+        {
+            if (player.IsLocallyOwned)
+                return GetActiveLevel();
+
+            return GetPlayerToLevelMapping().GetValueOrDefault(player.PlayerSlotIndex);
         }
 
         public static float GetDefaultMaxHp()

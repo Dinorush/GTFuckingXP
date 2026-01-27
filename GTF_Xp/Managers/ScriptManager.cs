@@ -5,6 +5,7 @@ using GTFuckingXp.Information;
 using GTFuckingXp.Managers;
 using GTFuckingXP.Enums;
 using GTFuckingXP.Extensions;
+using GTFuckingXP.Extensions.Information;
 using GTFuckingXP.Extensions.Information.Level.Json;
 using GTFuckingXP.Information;
 using GTFuckingXP.Information.ClassSelector;
@@ -27,6 +28,7 @@ namespace GTFuckingXP.Managers
         public const string LevelLayoutFileName = "ClassLayouts.json";
         public const string BoosterLayoutFileName = "BoosterEffects.json";
         public const string GroupFileName = "Groups.json";
+        public const string GlobalFileName = "Globals.json";
 
         private string _folderPath;
         private bool _initialized = false;
@@ -144,7 +146,7 @@ namespace GTFuckingXP.Managers
             CustomScalingBuffManager.ClearDefaultCustomBuffs();
         }
 
-        public (List<EnemyXp> enemyXpList, List<LevelLayout> levelLayouts, List<BoosterBuffs> boosterBuffs, List<Group> groups) ReadJsonBlocks()
+        public (List<EnemyXp> enemyXpList, List<LevelLayout> levelLayouts, List<BoosterBuffs> boosterBuffs, List<Group> groups, GlobalValues globals) ReadJsonBlocks()
         {
             var serializerSettings = new JsonSerializerOptions
             {
@@ -156,6 +158,7 @@ namespace GTFuckingXP.Managers
             serializerSettings.Converters.Add(new JsonStringEnumConverter());
             serializerSettings.Converters.Add(new CustomBuffConverter());
             serializerSettings.Converters.Add(new SingleBuffConverter());
+            serializerSettings.Converters.Add(new StartBuffConverter());
             var rundownExists = _folderPath.Contains("BepInEx");
 
             var enemyXpList = rundownExists ?
@@ -204,10 +207,20 @@ namespace GTFuckingXP.Managers
             
             if(groups is null || groups.Count == 0)
             {
-                LogManager.Warn("Not data found for Groups!");
+                LogManager.Warn("No data found for Groups!");
             }
 
-            return (enemyXpList, levelLayouts, boosterEffects, groups);
+            var globals = rundownExists ? JsonSerializer.Deserialize<GlobalValues>(
+                File.ReadAllText(Path.Combine(_folderPath, GlobalFileName)),
+                serializerSettings)
+                : new GlobalValues();
+
+            if (globals is null)
+            {
+                LogManager.Warn("No data found for Globals!");
+            }
+
+            return (enemyXpList, levelLayouts, boosterEffects, groups, globals);
         }
 
         public void UpdateEverything()
@@ -221,6 +234,7 @@ namespace GTFuckingXP.Managers
             CacheApi.SaveInstance(newData.levelLayouts, CacheApiWrapper.XpModCacheName);
             CacheApi.SaveInstance(newData.boosterBuffs, CacheApiWrapper.XpModCacheName);
             CacheApi.SaveInstance(newData.groups, CacheApiWrapper.XpModCacheName);
+            CacheApi.SaveInstance(newData.globals, CacheApiWrapper.XpModCacheName);
         }
 
         public string GetFolderPath()
@@ -276,6 +290,13 @@ namespace GTFuckingXP.Managers
             if(!File.Exists(groupsPath))
             {
                 File.WriteAllText(groupsPath, DefaultConstants.Groups);
+            }
+
+            serializerOptions.IncludeFields = true;
+            var globalsPath = Path.Combine(_folderPath, GlobalFileName);
+            if (!File.Exists(globalsPath))
+            {
+                File.WriteAllText(globalsPath, JsonSerializer.Serialize(new GlobalValues(), serializerOptions));
             }
 
             #region EnumValues

@@ -14,12 +14,16 @@ namespace EndskApi.Information.EnemyKill
         {
             KilledEnemyAgent = agentToKill;
             DamageDistributions = new();
+            TaggedBy = new();
         }
 
         public EnemyAgent KilledEnemyAgent { get; set; }
         public Dictionary<int, float> DamageDistributions { get; set; }
+        public HashSet<int> TaggedBy { get; set; }
         public PlayerAgent? LastHitDealtBy { get; set; }
         public LastHitType lastHitType { get; set; }
+
+        public void AddPlayerTagged(PlayerAgent agent) => TaggedBy.Add(agent.PlayerSlotIndex);
 
         public void AddDamageDealtByPlayerAgent(PlayerAgent agent, float damage)
         {
@@ -28,6 +32,8 @@ namespace EndskApi.Information.EnemyKill
             else
                 DamageDistributions[agent.PlayerSlotIndex] = currDamage + damage;
         }
+
+        public bool DidSnetBiotag(SNet_Player player) => TaggedBy.Contains(player.PlayerSlotIndex());
 
         public float GetDamageDealtBySnet(SNet_Player player)
         {

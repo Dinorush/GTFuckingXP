@@ -1,11 +1,7 @@
 ﻿using EndskApi.Enums.EnemyKill;
 using EndskApi.Information.EnemyKill;
-using EndskApi.Manager;
-using EndskApi.Patches.EnemyKill;
 using Enemies;
 using Player;
-using System;
-using System.Collections.Generic;
 
 namespace EndskApi.Api
 {
@@ -168,6 +164,13 @@ namespace EndskApi.Api
                 DamageDistributionAddDamageDealt(enemy, source, damage);
             if (willKill)
                 EnemyDied(enemy, source, LastHitType.ShootyWeapon);
+        }
+
+        public static void RegisterBiotag(EnemyAgent enemy, PlayerAgent source)
+        {
+            if (!_enemyDistributions.TryGetValue(enemy.Pointer, out var distribution))
+                _enemyDistributions.Add(enemy.Pointer, distribution = new(enemy));
+            distribution.AddPlayerTagged(source);
         }
     }
 }

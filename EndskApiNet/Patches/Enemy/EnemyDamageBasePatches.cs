@@ -7,7 +7,7 @@ using Player;
 using SNetwork;
 using System.Collections.Generic;
 
-namespace EndskApi.Patches.EnemyKill
+namespace EndskApi.Patches.Enemy
 {
     [HarmonyBefore(BepInExLoader.GUID, "com.dak.DamageNumbers")]
     [HarmonyPatch(typeof(Dam_EnemyDamageBase))]

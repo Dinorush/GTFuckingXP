@@ -9,13 +9,13 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
     {
         public override SingleUseBuff? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (reader.TokenType != JsonTokenType.StartObject) throw new JsonException("Expected CustomBuff to be an object");
+            if (reader.TokenType != JsonTokenType.StartObject) throw new JsonException("Expected SingleBuff to be an object");
             reader.Read();
 
             if (reader.TokenType == JsonTokenType.EndObject)
                 return new SingleUseBuff(SingleBuff.Invalid, 0f);
 
-            if (reader.TokenType != JsonTokenType.PropertyName) throw new JsonException("Expected CustomBuff name or \"CustomBuff\" property");
+            if (reader.TokenType != JsonTokenType.PropertyName) throw new JsonException("Expected SingleBuff name or \"SingleBuff\" property");
 
             SingleUseBuff buff;
             string name = reader.GetString()!;
@@ -24,7 +24,7 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
             if (name.TryToEnum<SingleBuff>(out var singleBuff))
             {
                 reader.Read();
-                if (reader.TokenType != JsonTokenType.Number) throw new JsonException("Expected CustomBuff name to be followed by a value");
+                if (reader.TokenType != JsonTokenType.Number) throw new JsonException("Expected SingleBuff name to be followed by a value");
 
                 float value = reader.GetSingle();
                 reader.Read();
@@ -35,7 +35,7 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
                 buff = new SingleUseBuff(SingleBuff.Invalid, 1f);
                 do
                 {
-                    if (reader.TokenType != JsonTokenType.PropertyName) throw new JsonException("Expected property name when parsing CustomBuff");
+                    if (reader.TokenType != JsonTokenType.PropertyName) throw new JsonException("Expected property name when parsing SingleBuff");
                     string propertyName = reader.GetString()!;
                     reader.Read();
                     switch (propertyName)
@@ -56,7 +56,7 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
             if (reader.TokenType == JsonTokenType.EndObject)
                 return buff;
 
-            throw new JsonException("Expected EndObject token when parsing CustomBuff");
+            throw new JsonException("Expected EndObject token when parsing SingleBuff");
         }
 
         public override void Write(Utf8JsonWriter writer, SingleUseBuff value, JsonSerializerOptions options)

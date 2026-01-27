@@ -38,7 +38,6 @@ namespace GTFuckingXP.Managers
             _loadedLayout = layout;
             SaveData _data = new(layout);
             File.WriteAllText(SavePath, JsonSerializer.Serialize(_data, _settings));
-            LogManager.Warn($"Saved layout to {SavePath}");
         }
 
         public static bool TryLoadLayout([MaybeNullWhen(false)] out LevelLayout layout)

@@ -17,6 +17,7 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
         {
             _setting.Converters.Add(new CustomBuffConverter());
             _setting.Converters.Add(new SingleBuffConverter());
+            _setting.Converters.Add(new StartBuffConverter());
         }
 
         public static T? Deserialize<T>(string json)
