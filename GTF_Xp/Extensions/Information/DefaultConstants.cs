@@ -1309,6 +1309,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 2,
     ""PersistentId"": 13,
     ""InfoText"": ""Good at everything, best at nothing.\nMax LV 10 Bonus: Double Jump\n\nBonuses Each LV up:\n+2% Damage\n+2% Armor\n+2% Infection Resist\n+10% Hack Skill\n-5% Terminal Delay\n+5% Tool Power\n+5% Repeller Power\n2% Ammo Refill\n2% Tool Refill\n4% Heal\n1% Speed"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -1658,6 +1659,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 0,
     ""PersistentId"": 2,
     ""InfoText"": ""Specialized in ranged combat. Stronger guns with ammo refunds on each level up.\nMax LV 10 bonus: +35% HP Regen Speed\n\nBonuses Each LV up:\n+4% Gun Damage\n+4% Ammo Refill\n\nBonus Each 5 LVs:\n+6% Ammo Refill"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -1877,6 +1879,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 0,
     ""PersistentId"": 9,
     ""InfoText"": ""Specialized in ranged combat. Powerful weapons but with poor Armor.\n<color=red>Starting Debuff: -40% Armor</color>\nMax LV 10\n\nBonuses Each LV up:\n+8% Gun Damage\n+3% Armor"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -2006,6 +2009,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 0,
     ""PersistentId"": 7,
     ""InfoText"": ""Specialized in melee combat. Deal high melee damage while gaining light Armor for survivability.\nMax LV 5 bonus: Double Jump\nLV 1 bonus: 125% Melee Damage\n\nBonuses Each LV up:\n+4% Armor\n+4% Speed"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -2105,6 +2109,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 0,
     ""PersistentId"": 8,
     ""InfoText"": ""Specialized in melee combat. Devastating in stealth and combat but with very poor survivability.\n<color=red>Starting Debuff: -45% Armor</color>\nMax LV 5 bonus: Double Jump\nLV 1 bonus: 215% Melee Damage\n\nBonuses Each LV up:\n+5% Armor\n+4% Speed"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -2209,6 +2214,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 0,
     ""PersistentId"": 10,
     ""InfoText"": ""Specialized in general combat. Improved damage with all guns and melee.\nMax LV 10\n\nBonuses Each LV up:\n+3% Gun Damage\n+6% Melee Damage\n+1% Speed"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -2388,6 +2394,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 1,
     ""PersistentId"": 3,
     ""InfoText"": ""Increased odds of survival in extreme conditions. Endure any scenario.\nMax LV 15 bonus: Infect Immune\n\nBonuses Each LV up:\n+3% Armor\n+3% Infect Resist\n10% Heal"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -2647,6 +2654,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 1,
     ""PersistentId"": 11,
     ""InfoText"": ""Specialized for surviving on the run. Greatly improved Projectile Armor and Infect Resist.\nMax LV 15\nLV 1 bonus: Infect Immune\n\nBonuses Each LV up:\n+2% Melee Armor\n+5% Projectile Armor\n10% Heal"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -2906,6 +2914,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 1,
     ""PersistentId"": 4,
     ""InfoText"": ""Specialized in keeping the team alive. Ensures that the team recovers quickly in bad scenarios.\nMax LV 5 bonus: +15% Armor\n\nBonuses Each LV up:\n+25% Revive Speed\n+35% HP Regen Speed"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -2980,6 +2989,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 1,
     ""PersistentId"": 12,
     ""InfoText"": ""Specialized in keeping the team alive. Great survivability and team support.\nMax LV 5 Bonus: +50% Infect Resist\n\nBonuses Each LV up:\n+10% Revive Speed\n+35% HP Regen Speed\n+4% Armor\n+5% Infect Resist\n+2% Speed"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -3079,6 +3089,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 1,
     ""PersistentId"": 15,
     ""InfoText"": ""Specialized in leaving everyone else in the dust. Superior mobility ensures survival when all else fails.\nMax LV 5 Bonus: Infect Immune, Double Jump\n\nBonuses Each LV up:\n+20% HP Regen Speed\n+8% Speed"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -3178,6 +3189,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 2,
     ""PersistentId"": 5,
     ""InfoText"": ""Specialized in supporting the team and resourcing. Keeps the team informed in more scenarios.\nMax LV 5 bonus: EZ Hack, Instant Terminals\n\nBonuses Each LV up:\n+55% Hack Skill\n-20% Terminal Delay\n+15% Tool Power\n+20% Repeller Power\n+8% Tool Refill"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -3277,6 +3289,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 2,
     ""PersistentId"": 16,
     ""InfoText"": ""Specialized in traversing infectious environments. Utilizes heavily modified fog repellers to devastating effect.\nMax LV 5 bonus: Global Fog Repeller\nLV 1 bonus: Infect Immune\n\nBonuses Each LV up:\n+15% Tool Power\n+60% Repeller Power\n+8% Tool Refill"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -3376,6 +3389,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 0,
     ""PersistentId"": 6,
     ""InfoText"": ""Specialized in suffering. Struggles for a long time, then becomes the strongest.\n<color=red>Starting Debuff: -50% Armor</color>\nMax LV 5 bonus: +80% Damage,\n+50% Max HP +50% Med Eff.\n\nBonuses Each LV up:\n-4% Armor\n+50% HP Regen Speed"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
@@ -3450,6 +3464,7 @@ namespace GTFuckingXp.Information
     ""GroupPersistentId"": 3,
     ""PersistentId"": 14,
     ""InfoText"": ""You are the last alive. Stay alive at all costs and complete the mission.\nLV 5 & Max LV 10 bonus: +40% Ammo Refill, +40% Tool Refill, +40% Heal\n\nPerks Each Level:\nLV1: Speed Demon\nLV2: Damage Amp\nLV3: Endurance\nLV4: Regeneration\nLV5: Technician\nLV6: Double Jump\nLV7: +50% Bioscan Speed\nLV8: Speed Demon II\nLV9: Gas Breather\nLV10: Godlike Regeneration"",
+    ""StartingBuffs"": [],
     ""Levels"": [
       {
         ""LevelNumber"": 0,
