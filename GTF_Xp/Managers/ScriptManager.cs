@@ -255,7 +255,7 @@ namespace GTFuckingXP.Managers
 
             var serializerOptions = new JsonSerializerOptions
             {
-                IncludeFields = false,
+                IncludeFields = true,
                 ReadCommentHandling = JsonCommentHandling.Skip,
                 PropertyNameCaseInsensitive = true,
                 WriteIndented = true
@@ -292,7 +292,6 @@ namespace GTFuckingXP.Managers
                 File.WriteAllText(groupsPath, DefaultConstants.Groups);
             }
 
-            serializerOptions.IncludeFields = true;
             var globalsPath = Path.Combine(_folderPath, GlobalFileName);
             if (!File.Exists(globalsPath))
             {
