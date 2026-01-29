@@ -8,7 +8,7 @@ namespace GTFuckingXP.Information.NetworkingInfo
     /// </summary>
     public struct GtfoApiXpInfo : IXpData
     {
-        public GtfoApiXpInfo(uint xpGain, uint debuffXp, int levelScaling, Vector3 position, bool forceDebuffXp = false)
+        public GtfoApiXpInfo(int xpGain, int debuffXp, int levelScaling, Vector3 position, bool forceDebuffXp = false)
         {
             XpGain = xpGain;
             DebuffXp = debuffXp;    
@@ -21,8 +21,8 @@ namespace GTFuckingXP.Information.NetworkingInfo
         }
 
         public bool ForceDebuffXp { get; set; }
-        public uint XpGain { get; set; }
-        public uint DebuffXp { get; set; }
+        public int XpGain { get; set; }
+        public int DebuffXp { get; set; }
         public int LevelScalingXpDecrese { get; set; }
 
         public float PositionX { get; set; }

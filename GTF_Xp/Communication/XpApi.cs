@@ -50,7 +50,7 @@ namespace GTFuckingXP.Communication
         /// Adds <paramref name="xpAmount"/> to the current xp amount.
         /// </summary>
         /// <returns>If the current api call was successful.</returns>
-        public static bool AddXp(uint xpAmount)
+        public static bool AddXp(int xpAmount)
         {
             try
             {

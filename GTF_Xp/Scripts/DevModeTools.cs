@@ -102,7 +102,7 @@ namespace GTFuckingXP.Scripts
             {
                 if (!string.IsNullOrEmpty(_addXpNumber))
                 {
-                    XpApi.AddXp(Convert.ToUInt32(_addXpNumber));
+                    XpApi.AddXp(Convert.ToInt32(_addXpNumber));
                     PlayerChatManager.WantToSentTextMessage(PlayerManager.GetLocalPlayerAgent(), $"Cheated {_addXpNumber}XP");
                 }
             }

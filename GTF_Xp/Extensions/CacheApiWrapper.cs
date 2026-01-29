@@ -1,4 +1,5 @@
 ﻿using EndskApi.Api;
+using GTFuckingXP.Extensions.Information;
 using GTFuckingXP.Information.ClassSelector;
 using GTFuckingXP.Information.Level;
 using GTFuckingXP.Managers;
@@ -271,6 +272,11 @@ namespace GTFuckingXP.Extensions
         public static void RemoveDefaultCustomScaling(Enums.CustomScaling customScaling)
         {
             CacheApi.RemoveInformation(customScaling, XpModCacheName);
+        }
+
+        public static GlobalValues GetGlobalValues()
+        {
+            return CacheApi.GetInstance<GlobalValues>(XpModCacheName);
         }
     }
 }

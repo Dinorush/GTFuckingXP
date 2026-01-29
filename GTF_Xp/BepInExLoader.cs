@@ -32,7 +32,7 @@ namespace GTFuckingXP
         MODNAME = "GTFuckingXP",
         AUTHOR = "Endskill",
         GUID = AUTHOR + "." + MODNAME,
-        VERSION = "2.5.2";
+        VERSION = "2.5.3";
 
         public static bool RundownDevMode { get; private set; }
         public static ConfigEntry<bool> DebugMessages { get; private set; }
@@ -113,6 +113,7 @@ namespace GTFuckingXP
             Harmony.PatchAll(typeof(PlayerRegenPatches));
             Harmony.PatchAll(typeof(FogTurbinePatches));
             Harmony.PatchAll(typeof(PlayerAmmoPatches));
+            Harmony.PatchAll(typeof(PlayerRevivePatches));
             AmmoFix.TryApplyPatches(Harmony);
         }
 

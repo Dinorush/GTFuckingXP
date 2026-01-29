@@ -1,6 +1,7 @@
 ﻿using EndskApi.Api;
 using GTFO.API;
 using GTFuckingXP.Extensions;
+using GTFuckingXP.Information;
 using GTFuckingXP.Information.Enemies;
 using GTFuckingXP.Information.Level;
 using GTFuckingXP.Information.NetworkingInfo;
@@ -148,7 +149,7 @@ namespace GTFuckingXP.Managers
 
         public static void SendReceiveXp(SNet_Player receiver, EnemyXp xpData, Vector3 position, bool forceDebuffXp)
         {
-            TrackClientXp(receiver, xpData, forceDebuffXp);
+            TrackXp(receiver, xpData, forceDebuffXp);
             NetworkAPI.InvokeEvent(_sendXpString, new GtfoApiXpInfo(xpData.XpGain, xpData.DebuffXp, xpData.LevelScalingXpDecrese, position, forceDebuffXp),
                 receiver);
         }
@@ -157,7 +158,7 @@ namespace GTFuckingXP.Managers
         {
             foreach (var player in PlayerManager.PlayerAgentsInLevel)
                 if (!player.IsLocallyOwned)
-                    TrackClientXp(player.Owner, xpData, forceDebuffXp);
+                    TrackXp(player.Owner, xpData, forceDebuffXp);
 
             NetworkAPI.InvokeEvent(_undistributedXp, new GtfoApiXpInfo(xpData.XpGain, xpData.DebuffXp, xpData.LevelScalingXpDecrese, position, forceDebuffXp));
         }
@@ -176,9 +177,11 @@ namespace GTFuckingXP.Managers
             NetworkAPI.InvokeEvent(_sendBoosterNetworkString, boosterInfo);
         }
 
-        public static void SendStaticXpInfo(SNet_Player receiver, uint xpGain, uint debuffXp, int levelScalingDecrease, Vector3 position)
+        public static void SendStaticXpInfo(SNet_Player receiver, int xpGain, int debuffXp, int levelScalingDecrease, Vector3 position)
         {
-            NetworkAPI.InvokeEvent(_receiveStaticXp, new StaticXpInfo(xpGain, debuffXp, levelScalingDecrease, position), receiver);
+            var info = new StaticXpInfo(xpGain, debuffXp, levelScalingDecrease, position);
+            TrackXp(receiver, info, false);
+            NetworkAPI.InvokeEvent(_receiveStaticXp, info, receiver);
         }
 
         public static void SendRequestXp()
@@ -186,26 +189,16 @@ namespace GTFuckingXP.Managers
             NetworkAPI.InvokeEvent(_requestXpString, false, SNet.Master);
         }
 
-        private static void TrackClientXp(SNet_Player receiver, EnemyXp xpData, bool forceDebuffXp)
+        private static void TrackXp(SNet_Player receiver, IXpData xpData, bool forceDebuffXp)
         {
-            uint xpValue = forceDebuffXp ? xpData.DebuffXp : xpData.XpGain;
+            int xpValue = xpData.GetXp(forceDebuffXp);
 
-            int levelScalingDecreaseXp = 0;
-            if (CacheApiWrapper.GetPlayerToLevelMapping().TryGetValue(receiver.PlayerSlotIndex(), out var level))
-                levelScalingDecreaseXp = xpData.LevelScalingXpDecrese * level.LevelNumber;
-
-            if (xpValue <= levelScalingDecreaseXp)
+            if (!receiver.IsLocal)
             {
-                xpValue = 1;
+                _clientXP.TryAdd(receiver.Lookup, 0);
+                _clientXP[receiver.Lookup] = (uint) (_clientXP[receiver.Lookup] + xpValue);
             }
-            else
-            {
-                xpValue = (uint)(xpValue - levelScalingDecreaseXp);
-            }
-
-            if (!_clientXP.ContainsKey(receiver.Lookup))
-                _clientXP.Add(receiver.Lookup, 0);
-            _clientXP[receiver.Lookup] += xpValue;
+            PlayerReviveManager.AddXP(receiver.Lookup, xpValue);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace GTFuckingXP.Information
+﻿using GTFuckingXP.Extensions;
+
+namespace GTFuckingXP.Information
 {
     /// <summary>
     /// Interface for handling xp calculations
@@ -8,12 +10,12 @@
         /// <summary>
         /// Gets or sets the xp gained by this instance.
         /// </summary>
-        uint XpGain { get; set; }
+        int XpGain { get; set; }
 
         /// <summary>
         /// Gets or sets the xp gained by this instance while being in a debuff state.
         /// </summary>
-        uint DebuffXp { get; set; }
+        int DebuffXp { get; set; }
 
         /// <summary>
         /// Gets or sets the amount of xp that gets subtracted for each level you currently are.
@@ -25,5 +27,27 @@
         /// which results into 4XP.
         /// </summary>
         int LevelScalingXpDecrese { get; set; }
+
+        public int GetXp(bool isDebuff)
+        {
+            int xpValue = isDebuff ? DebuffXp : XpGain;
+            bool isNeg = xpValue < 0;
+            if (isNeg)
+                xpValue *= -1;
+
+            var levelScalingDecreaseXp = LevelScalingXpDecrese * CacheApiWrapper.GetActiveLevel().LevelNumber;
+            if (xpValue <= levelScalingDecreaseXp)
+            {
+                xpValue = 1;
+            }
+            else
+            {
+                xpValue -= levelScalingDecreaseXp;
+            }
+
+            if (isNeg)
+                xpValue *= -1;
+            return xpValue;
+        }
     }
 }

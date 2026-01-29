@@ -7,7 +7,7 @@
     {
         public EnemyXp()
         { }
-        public EnemyXp(uint enemyId, string enemyName, uint killXp, uint debuffXp, int levelScalingXpDecrease, float biotagXpFrac = -1)
+        public EnemyXp(uint enemyId, string enemyName, int killXp, int debuffXp, int levelScalingXpDecrease, float biotagXpFrac = -1)
         {
             EnemyId = enemyId;
             EnemyName = enemyName;
@@ -30,12 +30,12 @@
         /// <summary>
         /// Gets or sets the xp gained by killing the enemy with the id <see cref="EnemyId"/>.
         /// </summary>
-        public uint XpGain { get; set; }
+        public int XpGain { get; set; }
 
         /// <summary>
         /// Gets or sets the xp gained by killing the enemy with the id <see cref="EnemyId"/> while being in a debuff phase.
         /// </summary>
-        public uint DebuffXp { get; set; }
+        public int DebuffXp { get; set; }
 
         /// <summary>
         /// Gets or sets the amount of xp that get subtracted each level you currently are.

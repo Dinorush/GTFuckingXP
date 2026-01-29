@@ -2,15 +2,15 @@
 {
     internal class DummyXp : IXpData
     {
-        public DummyXp(uint xpGain, uint debuffXp)
+        public DummyXp(int xpGain, int debuffXp)
         {
             XpGain = xpGain;
             DebuffXp = debuffXp;
             LevelScalingXpDecrese = 0;
         }
 
-        public uint XpGain { get; set; }
-        public uint DebuffXp { get; set; }
+        public int XpGain { get; set; }
+        public int DebuffXp { get; set; }
         public int LevelScalingXpDecrese { get; set; }
     }
 }

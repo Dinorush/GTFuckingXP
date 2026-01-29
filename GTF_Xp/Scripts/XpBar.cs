@@ -81,9 +81,9 @@ namespace GTFuckingXP.Scripts
                 }
                 else
                 {
-                    var currentLevelProgression = currentTotalXp - currentLevel.TotalXpRequired;
+                    int currentLevelProgression = (int) (currentTotalXp - currentLevel.TotalXpRequired);
                     var currentLevelFinish = nextLevel.TotalXpRequired - currentLevel.TotalXpRequired;
-                    var value = currentLevelProgression / Convert.ToDouble(currentLevelFinish);
+                    var value = Math.Max(0, currentLevelProgression / Convert.ToDouble(currentLevelFinish));
                     _xpProgressBar.size = new Vector2((float)(value * 300f), 20f);
 
                     statsString = string.Format(statsString, 

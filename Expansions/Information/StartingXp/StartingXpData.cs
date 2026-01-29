@@ -2,13 +2,13 @@
 {
     public class StartingXpData
     {
-        public StartingXpData(uint levelLayoutData, uint startingXp)
+        public StartingXpData(uint levelLayoutData, int startingXp)
         {
             LevelLayoutData = levelLayoutData;
             StartingXp = startingXp;
         }
 
         public uint LevelLayoutData { get; set; }
-        public uint StartingXp { get; set; }
+        public int StartingXp { get; set; }
     }
 }

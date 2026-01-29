@@ -3,6 +3,7 @@ using EndskApi.Information.EnemyKill;
 using Enemies;
 using GTFuckingXP.Extensions;
 using GTFuckingXP.Extensions.Information;
+using GTFuckingXP.Information;
 using GTFuckingXP.Information.Enemies;
 using GTFuckingXP.Managers;
 using GTFuckingXP.Scripts;
@@ -39,6 +40,7 @@ namespace GTFuckingXp.Managers
                         {
                             if (CacheApi.TryGetInstance<XpHandler>(out var xpHandler, CacheApiWrapper.XpModCacheName))
                             {
+                                PlayerReviveManager.AddXP(player.Lookup, ((IXpData)enemyXpData).GetXp(false));
                                 xpHandler.AddXp(enemyXpData, position, false);
                             }
                         }
@@ -59,17 +61,18 @@ namespace GTFuckingXp.Managers
                             float xpFrac = enemyXpData.BiotagXpFrac;
                             if (xpFrac < 0)
                             {
-                                xpFrac = CacheApi.GetInstance<GlobalValues>(CacheApiWrapper.XpModCacheName).BiotagXpFrac;
+                                xpFrac = CacheApiWrapper.GetGlobalValues().BiotagXpFrac;
                             }
                             percentageDealt = Math.Max(percentageDealt, xpFrac);
+                            bioTagged = xpFrac > 0;
                         }
                         
                         if (damageDealt > 0.5f || bioTagged)
                         {
                             LogManager.Debug($"percentageDealt = {percentageDealt}, damageDealt = {damageDealt}");
 
-                            NetworkApiXpManager.SendStaticXpInfo(player, (uint)(enemyXpData.XpGain * percentageDealt),
-                                        (uint)(enemyXpData.DebuffXp * percentageDealt), (int)(enemyXpData.LevelScalingXpDecrese * percentageDealt), position);
+                            NetworkApiXpManager.SendStaticXpInfo(player, (int)(enemyXpData.XpGain * percentageDealt),
+                                        (int)(enemyXpData.DebuffXp * percentageDealt), (int)(enemyXpData.LevelScalingXpDecrese * percentageDealt), position);
                         }
                     }
                 }

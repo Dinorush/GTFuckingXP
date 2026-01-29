@@ -85,19 +85,9 @@ namespace GTFuckingXP.Scripts
 
         public void AddXp(IXpData xpData, Vector3 xpTextPosition, bool forceDebuffXp = false, string xpPopupColor = "<#F80>")
         {
-            uint xpValue = forceDebuffXp || _hasDebuff ? xpData.DebuffXp : xpData.XpGain;
+            int xpValue = xpData.GetXp(forceDebuffXp || _hasDebuff);
 
-            var levelScalingDecreaseXp = (xpData.LevelScalingXpDecrese * CacheApiWrapper.GetActiveLevel().LevelNumber);
-            if(xpValue <= levelScalingDecreaseXp)
-            {
-                xpValue = 1;
-            }
-            else
-            {
-                xpValue = (uint)(xpValue - levelScalingDecreaseXp);
-            }
-
-            CurrentTotalXp += xpValue;
+            CurrentTotalXp = (uint) Math.Max(0, CurrentTotalXp + xpValue);
             LogManager.Debug($"Giving xp Amount {xpValue}, new total Xp is {CurrentTotalXp}");
             if (!CheckForLevelThresholdReached(xpTextPosition, out var header) && BepInExLoader.XpPopups.Value)
             {
