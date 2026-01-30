@@ -21,6 +21,7 @@ namespace GTFuckingXP.Managers
 
         private static void OnLevelCleanup()
         {
+            _totalXP.Clear();
             _storedXP.Clear();
             _checkpointXP.Clear();
         }
