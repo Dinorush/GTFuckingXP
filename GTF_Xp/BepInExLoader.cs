@@ -32,7 +32,7 @@ namespace GTFuckingXP
         MODNAME = "GTFuckingXP",
         AUTHOR = "Endskill",
         GUID = AUTHOR + "." + MODNAME,
-        VERSION = "2.5.4";
+        VERSION = "2.5.5";
 
         public static bool RundownDevMode { get; private set; }
         public static ConfigEntry<bool> DebugMessages { get; private set; }
@@ -80,6 +80,7 @@ namespace GTFuckingXP
             BoosterBuffManager.Instance = new BoosterBuffManager();
 
             NetworkApiXpManager.Setup();
+            PlayerReviveManager.Init();
 
             Harmony = new Harmony(GUID);
             FasterPatching();
