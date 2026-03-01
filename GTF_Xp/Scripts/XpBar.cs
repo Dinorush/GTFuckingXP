@@ -136,7 +136,8 @@ namespace GTFuckingXP.Scripts
             _xpProgressBar.color = new Color(255f / 255, 192f / 255f, 203f / 255);
 
             _textUi = GuiManager.Current.m_watermarkLayer.m_watermark.m_watermarkText.gameObject.Instantiate<TextMeshPro>("XpText");
-            _textUi.transform.Translate(new Vector3(-120f, 0f, 0f));
+            _textUi.transform.parent = GuiManager.Current.m_playerLayer.CustomComponentRoot;
+            _textUi.transform.Translate(new Vector3(-120f, 25f, 0f));
 
             CacheApi.SaveInstance(_textUi, CacheApiWrapper.XpModCacheName);
             CacheApi.SaveInstance(_xpBar, CacheApiWrapper.XpModCacheName);

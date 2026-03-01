@@ -1,11 +1,9 @@
 ﻿using EndskApi.Api;
+using Expansions.Patches.DoubleJump;
 using GTFuckingXp.Information;
 using GTFuckingXP.Information.Level;
 using HarmonyLib;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+using MTFO.Managers;
 using System.Text.Json;
 using XpExpansions.Information.DoubleJump;
 
@@ -13,19 +11,25 @@ namespace XpExpansions.Manager
 {
     public class DoubleJumpManager : BaseManager
     {
+        public const string OldGUID = "com.mccad00.DoubleJump";
         public const string DoubleJumpXpExpansionId = "Endskill.DoubleJumpExpansion";
         private const string _expansionFileName = "DoubleJumpExpansion.json";
+        private const string _configFileName = "DoubleJumpDefaultConfig.json";
 
-        private bool _harmonyState;
+        public static DoubleJumpConfig ActiveConfig { get; private set; } = new();
+        private static DoubleJumpConfig _baseConfig = new();
+        public static bool DoubleJumpUnlocked { get; private set; }
 
         public DoubleJumpManager()
         {
-            DoubleJumpHarmonyAbility = new Harmony(DoubleJumpXpExpansionId);
-            Harmony.UnpatchID(DoubleJump.EntryPoint.GUID);
-            _harmonyState = false;
-        }
+            Harmony.UnpatchID(OldGUID);
+            DoubleJumpUnlocked = false;
 
-        public Harmony DoubleJumpHarmonyAbility { get; private set; }
+            Harmony harmony = new(DoubleJumpXpExpansionId);
+            harmony.PatchAll(typeof(PLOC_Patches));
+            harmony.PatchAll(typeof(FallDamagePatches));
+            harmony.PatchAll(typeof(SuperJumpPatches));
+        }
 
         public override void Initialize()
         {
@@ -35,11 +39,7 @@ namespace XpExpansions.Manager
 
         public override void LevelCleanup()
         {
-            if (_harmonyState)
-            {
-                DoubleJumpHarmonyAbility.UnpatchSelf();
-                _harmonyState = false;
-            }
+            DoubleJumpUnlocked = false;
         }
 
         public override void LevelReached(Level level)
@@ -53,24 +53,12 @@ namespace XpExpansions.Manager
             {
                 if (doubleJump.UnlockAtLevel <= level.LevelNumber)
                 {
-                    if (!_harmonyState)
-                    {
-                        var doubleJumpAssembly = Assembly.GetAssembly(typeof(DoubleJump.EntryPoint));
-                        DoubleJumpHarmonyAbility.PatchAll(doubleJumpAssembly);
-                        _harmonyState = true;
-                    }
-                }
-                else if (_harmonyState)
-                {
-                    DoubleJumpHarmonyAbility.UnpatchSelf();
-                    _harmonyState = false;
+                    DoubleJumpUnlocked = true;
+                    ActiveConfig = doubleJump.DoubleJumpConfig ?? _baseConfig;
                 }
             }
-            else if (_harmonyState)
-            {
-                DoubleJumpHarmonyAbility.UnpatchSelf();
-                _harmonyState = false;
-            }
+            else
+                DoubleJumpUnlocked = false;
         }
 
 
@@ -86,6 +74,22 @@ namespace XpExpansions.Manager
             {
                 File.WriteAllText(doubleJumpPath, DefaultConstants.DoubleJumpExpansion);
             }
+
+            string configPath = Path.Combine(FolderPath, _configFileName);
+            if (File.Exists(configPath))
+            {
+                _baseConfig = JsonSerializer.Deserialize<DoubleJumpConfig>(File.ReadAllText(configPath))!;
+            }
+            else
+            {
+                var origConfigPath = Path.Combine(ConfigManager.CustomPath, "mccad00", "DoubleJump.json");
+                if (File.Exists(origConfigPath))
+                    _baseConfig = JsonSerializer.Deserialize<DoubleJumpConfig>(File.ReadAllText(origConfigPath))!;
+                else
+                    _baseConfig = new();
+
+                File.WriteAllText(configPath, JsonSerializer.Serialize(_baseConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = true }));
+            }
         }
 
         private void UpdateEverything()
@@ -93,18 +97,6 @@ namespace XpExpansions.Manager
             CacheApi.SaveInstance(JsonSerializer.Deserialize<List<DoubleJumpData>>(
                 File.ReadAllText(Path.Combine(FolderPath, _expansionFileName))),
                 Extensions.CacheApiWrapper.ExtensionCacheName);
-        }
-
-        private List<DoubleJumpData> GetDefaultData()
-        {
-            var data = new List<DoubleJumpData>();
-
-            for (int i = 0; i < 20; i++)
-            {
-                data.Add(new DoubleJumpData(i, 3));
-            }
-
-            return data;
         }
     }
 }

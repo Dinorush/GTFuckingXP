@@ -11,23 +11,28 @@ namespace GTFuckingXp.Information
         public const string DoubleJumpExpansion = @"[
   {
     ""LevelLayoutPersistentId"": 13,
-    ""UnlockAtLevel"": 10
+    ""UnlockAtLevel"": 10,
+    ""DoubleJumpConfig"": null
   },
   {
     ""LevelLayoutPersistentId"": 14,
-    ""UnlockAtLevel"": 6
+    ""UnlockAtLevel"": 6,
+    ""DoubleJumpConfig"": null
   },
   {
     ""LevelLayoutPersistentId"": 7,
-    ""UnlockAtLevel"": 5
+    ""UnlockAtLevel"": 5,
+    ""DoubleJumpConfig"": null
   },
   {
     ""LevelLayoutPersistentId"": 8,
-    ""UnlockAtLevel"": 5
+    ""UnlockAtLevel"": 5,
+    ""DoubleJumpConfig"": null
   },
   {
     ""LevelLayoutPersistentId"": 15,
-    ""UnlockAtLevel"": 5
+    ""UnlockAtLevel"": 5,
+    ""DoubleJumpConfig"": null
   }
 ]";
 

@@ -43,7 +43,7 @@
 	<!--Other plugin dependencies -->
 	<ItemGroup>
 		<Reference Include="$(PluginsFolder)/GTFO-API.dll"/>
+		<Reference Include="$(PluginsFolder)\**\MTFO.dll"/>
 		<Reference Include="$(PluginsFolder)\**\FloatingTextAPI.dll"/>
-		<Reference Include="$(PluginsFolder)\**\DoubleJump.dll"/>
 	</ItemGroup>
 </Project>

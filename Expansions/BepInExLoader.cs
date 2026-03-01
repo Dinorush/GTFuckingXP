@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using BepInEx.IL2CPP;
 using BepInEx.Unity.IL2CPP;
 using EndskApi.Api;
 using Il2CppInterop.Runtime.Injection;
@@ -12,13 +11,15 @@ namespace XpExpansions
     [BepInPlugin(GUID, MODNAME, VERSION)]
     [BepInDependency(GTFuckingXP.BepInExLoader.GUID, BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency(EndskApi.BepInExLoader.GUID, BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("com.dak.MTFO", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency(DoubleJumpManager.OldGUID, BepInDependency.DependencyFlags.SoftDependency)]
     public class BepinExLoader : BasePlugin
     {
         public const string
         MODNAME = "XpExpansions",
         AUTHOR = "Endskill",
         GUID = AUTHOR + "." + MODNAME,
-        VERSION = "1.0.0";
+        VERSION = "1.0.1";
 
         public override void Load()
         {
