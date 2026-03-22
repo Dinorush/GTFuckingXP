@@ -56,6 +56,8 @@ namespace XpExpansions.Manager
                     DoubleJumpUnlocked = true;
                     ActiveConfig = doubleJump.DoubleJumpConfig ?? _baseConfig;
                 }
+                else
+                    DoubleJumpUnlocked = false;
             }
             else
                 DoubleJumpUnlocked = false;

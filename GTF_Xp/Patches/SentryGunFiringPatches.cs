@@ -14,6 +14,8 @@ namespace GTFuckingXP.Patches
         private static void PrefixSentryAmmo(SentryGunInstance_Firing_Bullets __instance)
         {
             PlayerAgent owner = __instance.m_core.Owner;
+            if (owner == null) return;
+
             Level level;
             if (owner.IsLocallyOwned)
                 level = CacheApiWrapper.GetActiveLevel();
