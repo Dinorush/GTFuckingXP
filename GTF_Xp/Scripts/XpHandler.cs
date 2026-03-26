@@ -189,7 +189,7 @@ namespace GTFuckingXP.Scripts
             if (applyLevelBonuses)
                 ApplySingleUseBuffs(newLevel);
             LogManager.Debug("Pre applying custom scaling effects.");
-            CustomScalingBuffManager.ApplyCustomScalingEffects(PlayerManager.GetLocalPlayerAgent(), newLevel.CustomScaling);
+            CustomScalingBuffManager.ApplyCustomScalingEffects(newLevel.CustomScaling);
         }
 
         private void ApplySingleUseBuffs(Level reachedLevel)

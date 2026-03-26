@@ -142,7 +142,7 @@ namespace GTFuckingXP.Managers
             CacheApiWrapper.KillScript<XpBar>();
             CacheApiWrapper.KillScript<DevModeTools>();
             CacheApiWrapper.SetPlayerToLevelMapping(new Dictionary<int, Level>());
-            CustomScalingBuffManager.ResetCustomBuffs(PlayerManager.GetLocalPlayerAgent());
+            CustomScalingBuffManager.ResetCustomBuffs();
             CustomScalingBuffManager.ClearDefaultCustomBuffs();
         }
 

@@ -9,15 +9,15 @@ namespace GTFuckingXP.Managers
 {
     public static class CustomScalingBuffManager
     {
-        public static void ApplyCustomScalingEffects(PlayerAgent targetAgent, List<CustomScalingBuff> buffs)
+        public static void ApplyCustomScalingEffects(List<CustomScalingBuff> buffs)
         {
-            if (!targetAgent.IsLocallyOwned || buffs is null)
+            if (buffs is null)
                 return;
 
-            ResetCustomBuffs(targetAgent);
+            ResetCustomBuffs();
 
             foreach (var buff in buffs)
-                SetCustomBuff(buff, targetAgent);
+                SetCustomBuff(buff);
         }
 
         private static MeleeWeaponFirstPerson GetLocalMeleeWeapon()
@@ -32,12 +32,11 @@ namespace GTFuckingXP.Managers
             throw new System.Exception($"There is no {typeof(MeleeWeaponFirstPerson)} item in the local backpack!");
         }
 
-        private static void SetCustomBuff(CustomScalingBuff customScalingBuff, PlayerAgent targetAgent) => SetCustomBuff(customScalingBuff.CustomBuff, customScalingBuff.Value, targetAgent);
+        private static void SetCustomBuff(CustomScalingBuff customScalingBuff) => SetCustomBuff(customScalingBuff.CustomBuff, customScalingBuff.Value);
 
-        private static void SetCustomBuff(CustomScaling customBuff, float value, PlayerAgent targetAgent)
+        private static void SetCustomBuff(CustomScaling customBuff, float value)
         {
-            var playerData = targetAgent.PlayerData;
-
+            var playerData = GameData.PlayerDataBlock.GetBlock(1u);
             switch (customBuff)
             {
                 case CustomScaling.MeleeRangeMultiplier:
@@ -176,13 +175,11 @@ namespace GTFuckingXP.Managers
             }
         }
 
-        public static void ResetCustomBuffs(PlayerAgent targetAgent)
+        public static void ResetCustomBuffs()
         {
-            if (!targetAgent.IsLocallyOwned) return;
-
             foreach (CustomScaling customBuff in Enum.GetValues(typeof(CustomScaling)))
                 if (CacheApiWrapper.HasDefaultCustomScaling(customBuff))
-                    SetCustomBuff(customBuff, GetResetModifier(customBuff), targetAgent);
+                    SetCustomBuff(customBuff, GetResetModifier(customBuff));
         }
 
         public static void ClearDefaultCustomBuffs()

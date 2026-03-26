@@ -125,7 +125,6 @@ namespace GTFuckingXP.Managers
                         LogManager.Debug($"Setting HP of {player.name} to {newHealth}");
                         player.Damage.HealthMax = newHealth;
 
-                        CustomScalingBuffManager.ApplyCustomScalingEffects(player, level.CustomScaling);
                         CacheApiWrapper.GetPlayerToLevelMapping()[player.PlayerSlotIndex] = level;
                     }
                 }
