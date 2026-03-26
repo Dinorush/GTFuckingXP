@@ -32,7 +32,7 @@ namespace GTFuckingXP.Extensions
         /// <typeparam name="Tscript">The component that should be created and cached.</typeparam>
         public static Tscript DestroyOldCreateRegisterAndReturnComponent<Tscript>() where Tscript : Component
         {
-            if (CacheApi.TryGetInstance<Tscript>(out var instance, XpModCacheName))
+            if (CacheApi.TryGetInstance<Tscript>(out var instance, XpModCacheName, logNotFound: false))
             {
                 instance.gameObject.SetActive(false);
                 UnityEngine.Object.Destroy(instance);
@@ -53,7 +53,7 @@ namespace GTFuckingXP.Extensions
         /// <typeparam name="Tscript">The component that should be created and registered if it does not exist yet.</typeparam>
         public static Tscript CreateRegisterAndReturnComponent<Tscript>() where Tscript : Component
         {
-            if (CacheApi.TryGetInstance<Tscript>(out var instance, XpModCacheName))
+            if (CacheApi.TryGetInstance<Tscript>(out var instance, XpModCacheName, logNotFound: false))
             {
                 instance.gameObject.SetActive(true);
                 return instance;
@@ -72,7 +72,7 @@ namespace GTFuckingXP.Extensions
         /// </summary>
         public static void KillScript<Tscript>() where Tscript : Component
         {
-            if (CacheApi.TryGetInstance<Tscript>(out var script, XpModCacheName))
+            if (CacheApi.TryGetInstance<Tscript>(out var script, XpModCacheName, logNotFound: false))
             {
                 script.gameObject.SetActive(false);
                 UnityEngine.Object.Destroy(script);
@@ -216,7 +216,7 @@ namespace GTFuckingXP.Extensions
 
         public static bool TryGetAnchorDifference(out float anchorDifference)
         {
-            return CacheApi.TryGetInformation(AnchorDifferenceKey, out anchorDifference, XpModCacheName);
+            return CacheApi.TryGetInformation(AnchorDifferenceKey, out anchorDifference, XpModCacheName, logNotFound: false);
         }
 
         public static void SetLvlUpCallBackList(List<Action<Level>> lvlUpCallbacks)

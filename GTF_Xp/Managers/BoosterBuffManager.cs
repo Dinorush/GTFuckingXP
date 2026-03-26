@@ -15,7 +15,7 @@ namespace GTFuckingXP.Managers
         {
             #region ClearingOldBoosterEffects
             List<uint> playerBoosters;
-            if (!CacheApi.TryGetInformation(targetAgent.Owner.Lookup, out playerBoosters, CacheApiWrapper.XpModCacheName))
+            if (!CacheApi.TryGetInformation(targetAgent.Owner.Lookup, out playerBoosters, CacheApiWrapper.XpModCacheName, logNotFound: false))
             {
                 playerBoosters = new List<uint>();
             }

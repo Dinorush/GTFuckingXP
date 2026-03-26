@@ -93,21 +93,25 @@ namespace EndskApi.Scripts
             _middleMouseClickTools.Add(Tool);
         }
 
+        [HideFromIl2Cpp]
         public void RemoveMiddleMouseClickTool(IExtendedTool Tool)
         {
             _middleMouseClickTools.Remove(Tool);
         }
 
+        [HideFromIl2Cpp]
         public void AddTimedTool(IExtendedTool tool)
         {
             _timedTools.Add(tool);
         }
 
+        [HideFromIl2Cpp]
         public void RemoveTimedTool(IExtendedTool tool)
         {
             _timedTools.Remove(tool);
         }
 
+        [HideFromIl2Cpp]
         public void AddHiddenTool(Tool tool)
         {
             _hiddenTools.Add(tool);
@@ -116,6 +120,7 @@ namespace EndskApi.Scripts
             //_currentState = _toolToMenuMap.Any(it => it.Key.CurrentToggleState) ? MenuStates.Active : MenuStates.HiddenAndActive;
         }
 
+        [HideFromIl2Cpp]
         public void RemoveHiddenTool(Tool tool)
         {
             _hiddenTools.Remove(tool);
@@ -189,6 +194,7 @@ namespace EndskApi.Scripts
             }
         }
 
+        [HideFromIl2Cpp]
         private object GetInformationPackage(InformationId id)
         {
             switch (id)
@@ -202,6 +208,7 @@ namespace EndskApi.Scripts
             return null;
         }
 
+        [HideFromIl2Cpp]
         private void MenuToggleUpdated(Tool Tool, bool newToggle)
         {
             foreach(var unknown in _unknownMenus)
@@ -228,6 +235,7 @@ namespace EndskApi.Scripts
             _currentState = _toolToMenuMap.Any(it => it.Key.CurrentToggleState) ? MenuStates.HiddenAndActive : MenuStates.Active;
         }
 
+        [HideFromIl2Cpp]
         private InputTool GetFreeKeypadInput()
         {
             _keypadCounter += 1;

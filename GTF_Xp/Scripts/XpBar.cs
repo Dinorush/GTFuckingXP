@@ -2,6 +2,7 @@
 using GTFuckingXP.Extensions;
 using GTFuckingXP.Information;
 using GTFuckingXP.Information.Level;
+using Il2CppInterop.Runtime.Attributes;
 using System;
 using System.Text;
 using TMPro;
@@ -29,6 +30,7 @@ namespace GTFuckingXP.Scripts
         /// <param name="currentLevel">The current active stats.</param>
         /// <param name="nextLevel">The stats to receive when reaching next level.</param>
         /// <param name="currentTotalXp">The current total xp.</param>
+        [HideFromIl2Cpp]
         public void UpdateUiString(Level currentLevel, Level nextLevel, uint currentTotalXp, string header)
         {
             var stringBuilder = new StringBuilder();

@@ -5,6 +5,7 @@ using GTFuckingXP.Extensions;
 using GTFuckingXP.Information;
 using GTFuckingXP.Information.Level;
 using GTFuckingXP.Managers;
+using Il2CppInterop.Runtime.Attributes;
 using Il2CppSystem.Runtime.Remoting.Messaging;
 using Player;
 using System;
@@ -38,6 +39,7 @@ namespace GTFuckingXP.Scripts
         /// <summary>
         /// Gets the stats for the next level.
         /// </summary>
+        [HideFromIl2Cpp]
         public Level NextLevel { get; internal set; }
 
         /// <summary>
@@ -83,6 +85,7 @@ namespace GTFuckingXP.Scripts
             }
         }
 
+        [HideFromIl2Cpp]
         public void AddXp(IXpData xpData, Vector3 xpTextPosition, bool forceDebuffXp = false, string xpPopupColor = "<#F80>")
         {
             int xpValue = xpData.GetXp(forceDebuffXp || _hasDebuff);
@@ -166,6 +169,7 @@ namespace GTFuckingXP.Scripts
             CacheApi.GetInstance<XpBar>(CacheApiWrapper.XpModCacheName).UpdateUiString(CacheApiWrapper.GetActiveLevel(), NextLevel, CurrentTotalXp, levelLayout.Header);
         }
 
+        [HideFromIl2Cpp]
         internal void ChangeCurrentLevel(Level newLevel, BoosterBuffs newBoosterBuff = null, bool applyLevelBonuses = true)
         {
             CacheApiWrapper.SetActiveLevel(newLevel);
@@ -192,6 +196,7 @@ namespace GTFuckingXP.Scripts
             CustomScalingBuffManager.ApplyCustomScalingEffects(newLevel.CustomScaling);
         }
 
+        [HideFromIl2Cpp]
         private void ApplySingleUseBuffs(Level reachedLevel)
         {
             var player = PlayerManager.GetLocalPlayerAgent();

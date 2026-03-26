@@ -25,7 +25,7 @@ namespace GTFuckingXP.Communication
                 scriptManager.UpdateEverything();
 
                 //There is no real need to change the current Levellayout, this information is only set while in an expedition.
-                if (CacheApi.TryGetInformation<LevelLayout>(CacheApiWrapper.LevelLayoutKey, out var levelLayout, CacheApiWrapper.XpModCacheName))
+                if (CacheApi.TryGetInformation<LevelLayout>(CacheApiWrapper.LevelLayoutKey, out var levelLayout, CacheApiWrapper.XpModCacheName, logNotFound: false))
                 {
                     var lvls = CacheApi.GetInstance<List<LevelLayout>>(CacheApiWrapper.XpModCacheName);
                     var newLevelLayout = lvls.FirstOrDefault(it => it.Header == levelLayout.Header);

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using EndskApi.Api;
+﻿using EndskApi.Api;
+using EndskApi.Information.Menus;
+using EndskApi.Manager;
 using EndskApi.Scripts;
 using GTFuckingXP.Communication;
 using GTFuckingXP.Extensions;
 using GTFuckingXP.Information.Level;
+using Il2CppInterop.Runtime.Attributes;
 using Player;
-using EndskApi.Information.Menus;
-using EndskApi.Manager;
 using UnityEngine;
 
 namespace GTFuckingXP.Scripts
@@ -30,11 +29,13 @@ namespace GTFuckingXP.Scripts
             base.Update();
         }
 
+        [HideFromIl2Cpp]
         public void ReloadData(Tool _)
         {
             XpApi.ReloadData();
         }
 
+        [HideFromIl2Cpp]
         public void LevelUp(Tool _)
         {
             if (XpApi.SetCurrentLevel(CacheApiWrapper.GetActiveLevel().LevelNumber + 1, out var cheatedXp))
@@ -43,6 +44,7 @@ namespace GTFuckingXP.Scripts
             }
         }
 
+        [HideFromIl2Cpp]
         public void LevelDown(Tool _)
         {
             if (XpApi.SetCurrentLevel(CacheApiWrapper.GetActiveLevel().LevelNumber - 1, out var cheatedXp))
@@ -51,6 +53,7 @@ namespace GTFuckingXP.Scripts
             }
         }
 
+        [HideFromIl2Cpp]
         public void ChangeClass(Tool _)
         {
             var levelLayouts = CacheApi.GetInstance<List<LevelLayout>>(CacheApiWrapper.XpModCacheName);
