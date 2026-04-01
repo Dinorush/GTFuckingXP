@@ -1,6 +1,6 @@
-﻿using GTFuckingXP.Dependencies;
+﻿using GTFuckingXP.Enums;
 using GTFuckingXP.Extensions;
-using GTFuckingXP.Managers;
+using GTFuckingXP.Information.Level;
 using HarmonyLib;
 using Player;
 
@@ -16,22 +16,12 @@ namespace GTFuckingXP.Patches
         {
             if (RundownManager.ActiveExpedition == null || !owner.IsLocallyOwned || !CacheApiWrapper.TryGetCurrentLevelLayout(out var layout) || layout.StartingBuffs == null) return;
 
-            float[] mods = new float[]{ 1f, 1f, 1f };
-            foreach (var startingBuff in layout.StartingBuffs)
+            float[] mods = new float[]
             {
-                switch (startingBuff.StartBuff)
-                {
-                    case Enums.StartBuff.AmmunitionMainMultiplier:
-                        mods[0] *= startingBuff.Value;
-                        break;
-                    case Enums.StartBuff.AmmunitionSpecialMultiplier:
-                        mods[1] *= startingBuff.Value;
-                        break;
-                    case Enums.StartBuff.AmmunitionToolMultiplier:
-                        mods[2] *= startingBuff.Value;
-                        break;
-                }
-            }
+                layout.StartingBuffs.GetValueOrDefault(StartBuff.AmmunitionMainMultiplier, 1f),
+                layout.StartingBuffs.GetValueOrDefault(StartBuff.AmmunitionSpecialMultiplier, 1f),
+                layout.StartingBuffs.GetValueOrDefault(StartBuff.AmmunitionToolMultiplier, 1f)
+            };
 
             if (mods.All(mod => mod == 1)) return;
 
@@ -55,6 +45,43 @@ namespace GTFuckingXP.Patches
             oldMod = modifierInstance.GetModifierValue(AgentModifier.InitialAmmoTool) + 1;
             AgentModifierManager.ClearModifierChange(idArr[2]);
             idArr[2] = AgentModifierManager.AddModifierValue(owner, AgentModifier.InitialAmmoTool, oldMod * mods[2] - 1f);
+        }
+
+        [HarmonyPatch(typeof(PlayerAmmoStorage), nameof(PlayerAmmoStorage.PickupAmmo))]
+        [HarmonyWrapSafe]
+        [HarmonyPrefix]
+        private static void AmmoPackCallback(AmmoType ammoType, ref float ammoAmount)
+        {
+            var customBuff = ammoType switch
+            {
+                AmmoType.Standard or AmmoType.Special => CustomScaling.AmmoGainEfficiency,
+                AmmoType.Class => CustomScaling.ToolGainEfficiency,
+                _ => CustomScaling.Invalid
+            };
+
+            var level = CacheApiWrapper.GetActiveLevel();
+            float totalMod = 1f;
+            if (customBuff != CustomScaling.Invalid)
+            {
+                if (level.CustomScaling.TryGetValue(customBuff, out var value))
+                    totalMod *= value;
+            }
+
+            customBuff = ammoType switch
+            {
+                AmmoType.Standard or AmmoType.Special => CustomScaling.AmmoCapacity,
+                AmmoType.Class => CustomScaling.ToolCapacity,
+                _ => CustomScaling.Invalid
+            };
+            if (customBuff != CustomScaling.Invalid)
+            {
+                if (level.CustomScaling.TryGetValue(customBuff, out var value))
+                    totalMod /= value;
+            }
+
+            if (totalMod == 1f) return;
+
+            ammoAmount *= totalMod;
         }
     }
 }

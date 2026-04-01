@@ -1,32 +1,47 @@
-﻿using System.Runtime.InteropServices;
+﻿using GTFuckingXP.Enums;
+using System.Runtime.InteropServices;
 
 namespace GTFuckingXP.Information.NetworkingInfo
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct LevelReachedInfo
     {
-        public LevelReachedInfo(int levelNumber, float healthMultiplier, string customScaling)
+        private const int BufferSize = (int) CustomScaling.Count + 1;
+
+        public LevelReachedInfo(int levelNumber, float healthMultiplier, Dictionary<CustomScaling, float> customScaling)
         {
             LevelNumber = levelNumber;
             HealthMultiplier = healthMultiplier;
-            CustomScaling = customScaling;
+            _customScalingEnum = new CustomScaling[BufferSize];
+            _customScalingValue = new float[BufferSize];
+            int i = 0;
+            foreach (var kv in customScaling)
+            {
+                _customScalingEnum[i] = kv.Key;
+                _customScalingValue[i] = kv.Value;
+                i++;
+            }
+            _customScalingEnum[customScaling.Count + 1] = CustomScaling.NetworkBreak;
         }
-
-        //public LevelReachedInfo(Level.Level newLevel)
-        //{
-        //    LevelNumber = newLevel.LevelNumber;
-        //    HealthMultiplier = newLevel.HealthMultiplier;
-
-        //    CustomScaling = JsonSerializer.Serialize(
-        //        newLevel.CustomScaling is null ? 
-        //        new System.Collections.Generic.List<Level.CustomScalingBuff>() : 
-        //        newLevel.CustomScaling);
-        //}
 
         public int LevelNumber;
         public float HealthMultiplier;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 230)]
-        public string CustomScaling;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = BufferSize)]
+        private readonly CustomScaling[] _customScalingEnum;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = BufferSize)]
+        private readonly float[] _customScalingValue;
+
+        public readonly Dictionary<CustomScaling, float> GetCustomScaling()
+        {
+            Dictionary<CustomScaling, float> result = new();
+            for (int i = 0; i < BufferSize; i++)
+            {
+                if (_customScalingEnum[i] == CustomScaling.NetworkBreak)
+                    return result;
+                result.Add(_customScalingEnum[i], _customScalingValue[i]);
+            }
+            return result;
+        }
     }
 }

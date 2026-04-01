@@ -1,4 +1,7 @@
-﻿using System.Text.Json;
+﻿using GTFuckingXP.Enums;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GTFuckingXP.Extensions.Information.Level.Json
 {
@@ -15,9 +18,13 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
 
         static BuffJson()
         {
+            _setting.Converters.Add(new JsonStringEnumConverter());
             _setting.Converters.Add(new CustomBuffConverter());
             _setting.Converters.Add(new SingleBuffConverter());
             _setting.Converters.Add(new StartBuffConverter());
+            _setting.Converters.Add(new LegacyBuffConverter<CustomScaling>());
+            _setting.Converters.Add(new LegacyBuffConverter<SingleBuff>());
+            _setting.Converters.Add(new LegacyBuffConverter<StartBuff>());
         }
 
         public static T? Deserialize<T>(string json)

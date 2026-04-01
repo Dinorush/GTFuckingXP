@@ -49,7 +49,7 @@ namespace GTFuckingXP.Scripts
 
         public void Awake()
         {
-            if(CacheApiWrapper.TryGetXpStorageData(out var checkpointXpData))
+            if (CacheApiWrapper.TryGetXpStorageData(out var checkpointXpData))
             {
                 //Old level layout may be changed because of xp dev tools or other future plans :)
                 CacheApiWrapper.SetCurrentLevelLayout(checkpointXpData.levelLayout);
@@ -57,7 +57,7 @@ namespace GTFuckingXP.Scripts
             }
             else
             {
-                if (!CacheApiWrapper.TryGetCurrentLevelLayout(out var levelLayout))
+                if (!CacheApiWrapper.TryGetCurrentLevelLayout(out var levelLayout) || !SaveManager.CheckValidLayout(levelLayout))
                 {
                     levelLayout = CacheApiWrapper.GetDefaultLayout();
                     CacheApiWrapper.SetCurrentLevelLayout(levelLayout);
@@ -200,24 +200,24 @@ namespace GTFuckingXP.Scripts
         private void ApplySingleUseBuffs(Level reachedLevel)
         {
             var player = PlayerManager.GetLocalPlayerAgent();
-            foreach(var singleUseBuff in reachedLevel.LevelUpBonus)
+            foreach((var buff, var value) in reachedLevel.LevelUpBonus)
             {
-                switch(singleUseBuff.SingleBuff)
+                switch(buff)
                 {
                     case SingleBuff.Heal:
-                        player.GiveHealth(player, singleUseBuff.Value);
+                        player.GiveHealth(player, value);
                         break;
                     case SingleBuff.Desinfect:
-                        player.GiveDisinfection(player, singleUseBuff.Value);
+                        player.GiveDisinfection(player, value);
                         break;
                     case SingleBuff.AmmunitionMain:
-                        GiveAmmoRel(player, singleUseBuff.Value, InventorySlot.GearStandard);
+                        GiveAmmoRel(player, value, InventorySlot.GearStandard);
                         break;
                     case SingleBuff.AmmunitionSpecial:
-                        GiveAmmoRel(player, singleUseBuff.Value, InventorySlot.GearSpecial);
+                        GiveAmmoRel(player, value, InventorySlot.GearSpecial);
                         break;
                     case SingleBuff.AmmunitionTool:
-                        GiveAmmoRel(player, singleUseBuff.Value, InventorySlot.GearClass);
+                        GiveAmmoRel(player, value, InventorySlot.GearClass);
                         break;
                 }
             }
@@ -238,19 +238,8 @@ namespace GTFuckingXP.Scripts
                 _ => 0
             };
 
-            ammoStorage.PickupAmmo(SlotToAmmo(slot), ammoRel * cap);
+            ammoStorage.PickupAmmo(slot.ToAmmoType(), ammoRel * cap);
             PlayerBackpackManager.ForceLocalAmmoStorageUpdate();
-        }
-
-        private static AmmoType SlotToAmmo(InventorySlot slot)
-        {
-            return slot switch
-            {
-                InventorySlot.GearStandard => AmmoType.Standard,
-                InventorySlot.GearSpecial => AmmoType.Special,
-                InventorySlot.GearClass => AmmoType.Class,
-                _ => AmmoType.None
-            };
         }
     }
 }

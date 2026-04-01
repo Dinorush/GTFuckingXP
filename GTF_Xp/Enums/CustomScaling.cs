@@ -2,6 +2,7 @@
 {
     public enum CustomScaling
     {
+        NetworkBreak = -999,
         Invalid = -1,
         MeleeRangeMultiplier,
         MeleeHitBoxSizeMultiplier,
@@ -17,8 +18,13 @@
         RegenStartDelayMultiplier,
         BleedResistance,
         AmmoEfficiency,
+        AmmoGainEfficiency,
+        AmmoCapacity,
         ToolEfficiency,
+        ToolGainEfficiency,
+        ToolCapacity,
         ExplosionResistance,
-        BulletResistance
+        BulletResistance,
+        Count
     }
 }

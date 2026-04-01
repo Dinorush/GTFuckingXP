@@ -14,15 +14,11 @@ namespace GTFuckingXp.Patches
         private static void Postfix_OnDamage(Dam_PlayerDamageBase __instance)
         {
             PlayerAgent player = __instance.Owner;
-            Level? level;
-            if (player.IsLocallyOwned)
-                level = CacheApiWrapper.GetActiveLevel();
-            else if (!CacheApiWrapper.GetPlayerToLevelMapping().TryGetValue(player.PlayerSlotIndex, out level))
+            if (!CacheApiWrapper.TryGetActiveLevel(player, out var level))
                 return;
 
-            CustomScalingBuff? buff = level.CustomScaling.FirstOrDefault(buff => buff.CustomBuff == CustomScaling.RegenStartDelayMultiplier);
-            if (buff != null)
-                __instance.m_nextRegen = Clock.Time + player.PlayerData.healthRegenStartDelayAfterDamage * buff.Value;
+            if (level.CustomScaling.TryGetValue(CustomScaling.RegenStartDelayMultiplier, out var value))
+                __instance.m_nextRegen = Clock.Time + player.PlayerData.healthRegenStartDelayAfterDamage * value;
         }
     }
 }

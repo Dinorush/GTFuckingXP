@@ -78,7 +78,8 @@ namespace GTFuckingXP.Managers
             return CheckValidLayout();
         }
 
-        private static bool CheckValidLayout()
+        private static bool CheckValidLayout() => CheckValidLayout(_loadedLayout);
+        public static bool CheckValidLayout(LevelLayout layout)
         {
             if (_loadedLayout == null) return false;
             

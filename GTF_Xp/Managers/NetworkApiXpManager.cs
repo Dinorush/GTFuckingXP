@@ -164,11 +164,7 @@ namespace GTFuckingXP.Managers
 
         public static void SendNewLevelActive(Level newLevel)
         {
-            var customScaling = JsonSerializer.Serialize((
-                    newLevel.CustomScaling is null ?
-                    new List<CustomScalingBuff>() :
-                    newLevel.CustomScaling));
-            NetworkAPI.InvokeEvent(_levelStatsDistribution, new LevelReachedInfo(newLevel.LevelNumber, newLevel.HealthMultiplier, customScaling));
+            NetworkAPI.InvokeEvent(_levelStatsDistribution, new LevelReachedInfo(newLevel.LevelNumber, newLevel.HealthMultiplier, newLevel.CustomScaling));
         }
 
         public static void SendBoosterStatsReached(BoosterInfo boosterInfo)

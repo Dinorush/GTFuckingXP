@@ -1,23 +1,23 @@
 ﻿using Gear;
 using GTFuckingXP.Enums;
 using GTFuckingXP.Extensions;
-using GTFuckingXP.Information.Level;
-using Player;
 using ModifierAPI;
+using Player;
 
 namespace GTFuckingXP.Managers
 {
     public static class CustomScalingBuffManager
     {
-        public static void ApplyCustomScalingEffects(List<CustomScalingBuff> buffs)
+        public static void ApplyCustomScalingEffects(Dictionary<CustomScaling, float> buffs)
         {
             if (buffs is null)
                 return;
 
             ResetCustomBuffs();
 
-            foreach (var buff in buffs)
-                SetCustomBuff(buff);
+            foreach ((var buff, var value) in buffs)
+                SetCustomBuff(buff, value);
+            UpdateAmmoEfficiencies(buffs);
         }
 
         private static MeleeWeaponFirstPerson GetLocalMeleeWeapon()
@@ -31,8 +31,6 @@ namespace GTFuckingXP.Managers
             LogManager.Warn("No melee weapon found o.O?");
             throw new System.Exception($"There is no {typeof(MeleeWeaponFirstPerson)} item in the local backpack!");
         }
-
-        private static void SetCustomBuff(CustomScalingBuff customScalingBuff) => SetCustomBuff(customScalingBuff.CustomBuff, customScalingBuff.Value);
 
         private static void SetCustomBuff(CustomScaling customBuff, float value)
         {
@@ -149,29 +147,6 @@ namespace GTFuckingXP.Managers
 
                     playerData.jumpVerticalVelocityMax = jumpVelocityMax + value;
                     break;
-                case CustomScaling.AmmoEfficiency:
-                    // Not how defaults are used elsewhere, but has better compatibility with EWC
-                    if (!CacheApiWrapper.TryGetDefaultCustomScaling(customBuff, out float lastAmmo))
-                        lastAmmo = 1f;
-
-                    PlayerAmmoStorage ammoStorage = PlayerBackpackManager.LocalBackpack.AmmoStorage;
-                    ChangeAmmoEfficiency(InventorySlot.GearStandard, ammoStorage, lastAmmo, value);
-                    ChangeAmmoEfficiency(InventorySlot.GearSpecial, ammoStorage, lastAmmo, value);
-                    ammoStorage.NeedsSync = true;
-
-                    CacheApiWrapper.SetDefaultCustomScaling(customBuff, value);
-                    break;
-                case CustomScaling.ToolEfficiency:
-                    // Not how defaults are used elsewhere, but has better compatibility with EWC
-                    if (!CacheApiWrapper.TryGetDefaultCustomScaling(customBuff, out float lastTool))
-                        lastTool = 1f;
-
-                    PlayerAmmoStorage toolStorage = PlayerBackpackManager.LocalBackpack.AmmoStorage;
-                    ChangeAmmoEfficiency(InventorySlot.GearClass, toolStorage, lastTool, value);
-                    toolStorage.NeedsSync = true;
-
-                    CacheApiWrapper.SetDefaultCustomScaling(customBuff, value);
-                    break;
             }
         }
 
@@ -180,6 +155,7 @@ namespace GTFuckingXP.Managers
             foreach (CustomScaling customBuff in Enum.GetValues(typeof(CustomScaling)))
                 if (CacheApiWrapper.HasDefaultCustomScaling(customBuff))
                     SetCustomBuff(customBuff, GetResetModifier(customBuff));
+            UpdateAmmoEfficiencies();
         }
 
         public static void ClearDefaultCustomBuffs()
@@ -189,6 +165,10 @@ namespace GTFuckingXP.Managers
             CacheApiWrapper.RemoveDefaultCustomScaling(CustomScaling.MeleeHitBoxSizeMultiplier);
             CacheApiWrapper.RemoveDefaultCustomScaling(CustomScaling.AmmoEfficiency);
             CacheApiWrapper.RemoveDefaultCustomScaling(CustomScaling.ToolEfficiency);
+            CacheApiWrapper.RemoveDefaultCustomScaling(CustomScaling.AmmoGainEfficiency);
+            CacheApiWrapper.RemoveDefaultCustomScaling(CustomScaling.ToolGainEfficiency);
+            CacheApiWrapper.RemoveDefaultCustomScaling(CustomScaling.AmmoCapacity);
+            CacheApiWrapper.RemoveDefaultCustomScaling(CustomScaling.ToolCapacity);
         }
 
         private static float GetResetModifier(CustomScaling customBuff)
@@ -206,29 +186,84 @@ namespace GTFuckingXP.Managers
             };
         }
 
-        private static void ChangeAmmoEfficiency(InventorySlot slot, PlayerAmmoStorage ammoStorage, float lastValue, float value)
+        private static void UpdateAmmoEfficiencies(Dictionary<CustomScaling, float>? buffs = null)
         {
-            if (!ammoStorage.m_playerBackpack.TryGetBackpackItem(slot, out var bpItem)) return;
-            ItemEquippable item = bpItem.Instance.Cast<ItemEquippable>();
-            InventorySlotAmmo slotAmmo = ammoStorage.GetInventorySlotAmmo(slot);
+            UpdateAmmoEfficiencies(true, buffs);
+            UpdateAmmoEfficiencies(false, buffs);
+        }
 
-            int newClip = 0;
-            if (slotAmmo.BulletClipSize > 0)
+        private static void UpdateAmmoEfficiencies(bool isAmmo, Dictionary<CustomScaling, float>? buffs = null)
+        {
+            var capEnum = isAmmo ? CustomScaling.AmmoCapacity : CustomScaling.ToolCapacity;
+            var gainEnum = isAmmo ? CustomScaling.AmmoGainEfficiency : CustomScaling.ToolGainEfficiency;
+            var effEnum = isAmmo ? CustomScaling.AmmoEfficiency : CustomScaling.ToolEfficiency;
+
+            if (!CacheApiWrapper.TryGetDefaultCustomScaling(capEnum, out float oldCap))
+                oldCap = 1f;
+            if (!CacheApiWrapper.TryGetDefaultCustomScaling(gainEnum, out float oldGain))
+                oldGain = 1f;
+
+            float cap;
+            float gain;
+            if (buffs != null)
             {
-                // Add clip ammo to reserves, apply modifier, then fill clip up to previous number if possible.
-                slotAmmo.AmmoInPack += item.GetCurrentClip() * slotAmmo.CostOfBullet;
-                slotAmmo.Setup(slotAmmo.CostOfBullet * lastValue / value, slotAmmo.BulletClipSize);
-                newClip = Math.Min(slotAmmo.BulletsInPack, item.GetCurrentClip());
-                item.SetCurrentClip(newClip);
-                slotAmmo.AmmoInPack -= newClip * slotAmmo.CostOfBullet;
+                cap = buffs.GetValueOrDefault(capEnum, 1f);
+                gain = buffs.GetValueOrDefault(gainEnum, 1f);
+                if (buffs.TryGetValue(effEnum, out var efficiency))
+                {
+                    cap *= efficiency;
+                    gain *= efficiency;
+                }
             }
-            else // Tools don't have a clip
+            else
             {
-                slotAmmo.Setup(slotAmmo.CostOfBullet *= lastValue / value, slotAmmo.BulletClipSize);
+                cap = 1f;
+                gain = 1f;
             }
 
-            slotAmmo.OnBulletsUpdateCallback?.Invoke(slotAmmo.BulletsInPack);
-            ammoStorage.UpdateSlotAmmoUI(slotAmmo, newClip);
+            if (cap == oldCap && gain == oldGain) return;
+
+            PlayerAmmoStorage ammoStorage = PlayerBackpackManager.LocalBackpack.AmmoStorage;
+            void ChangeAmmoEfficiency(InventorySlot slot)
+            {
+                if (!ammoStorage.m_playerBackpack.TryGetBackpackItem(slot, out var bpItem)) return;
+                InventorySlotAmmo slotAmmo = ammoStorage.GetInventorySlotAmmo(slot);
+
+                int newClip = 0;
+                float capMod = oldCap / cap;
+                float ammoMod = gain / oldGain * capMod;
+                if (slotAmmo.BulletClipSize > 0)
+                {
+                    ItemEquippable item = bpItem.Instance.Cast<ItemEquippable>();
+                    // Add clip ammo to reserves, apply modifier, then fill clip up to previous number if possible.
+                    slotAmmo.AmmoInPack = (slotAmmo.AmmoInPack + item.GetCurrentClip() * slotAmmo.CostOfBullet) * ammoMod;
+                    slotAmmo.Setup(slotAmmo.CostOfBullet * capMod, slotAmmo.BulletClipSize);
+                    newClip = Math.Min(slotAmmo.BulletsInPack, item.GetCurrentClip());
+                    item.SetCurrentClip(newClip);
+                    slotAmmo.AmmoInPack -= newClip * slotAmmo.CostOfBullet;
+                }
+                else // Tools don't have a clip
+                {
+                    slotAmmo.AmmoInPack *= ammoMod;
+                    slotAmmo.Setup(slotAmmo.CostOfBullet *= capMod, slotAmmo.BulletClipSize);
+                }
+
+                slotAmmo.OnBulletsUpdateCallback?.Invoke(slotAmmo.BulletsInPack);
+                ammoStorage.UpdateSlotAmmoUI(slotAmmo, newClip);
+            }
+
+            if (isAmmo)
+            {
+                ChangeAmmoEfficiency(InventorySlot.GearStandard);
+                ChangeAmmoEfficiency(InventorySlot.GearSpecial);
+            }
+            else
+                ChangeAmmoEfficiency(InventorySlot.GearClass);
+
+            ammoStorage.NeedsSync = true;
+
+            CacheApiWrapper.SetDefaultCustomScaling(capEnum, cap);
+            CacheApiWrapper.SetDefaultCustomScaling(gainEnum, gain);
         }
 
         /*private static void StartRepellerWithoutSound(FogRepeller_Sphere antiFog)

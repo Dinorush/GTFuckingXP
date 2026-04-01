@@ -148,22 +148,11 @@ namespace GTFuckingXP.Managers
 
         public (List<EnemyXp> enemyXpList, List<LevelLayout> levelLayouts, List<BoosterBuffs> boosterBuffs, List<Group> groups, GlobalValues globals) ReadJsonBlocks()
         {
-            var serializerSettings = new JsonSerializerOptions
-            {
-                IncludeFields = true,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-                PropertyNameCaseInsensitive = true,
-                WriteIndented = true
-            };
-            serializerSettings.Converters.Add(new JsonStringEnumConverter());
-            serializerSettings.Converters.Add(new CustomBuffConverter());
-            serializerSettings.Converters.Add(new SingleBuffConverter());
-            serializerSettings.Converters.Add(new StartBuffConverter());
             var rundownExists = _folderPath.Contains("BepInEx");
 
             var enemyXpList = rundownExists ?
-                JsonSerializer.Deserialize<List<EnemyXp>>(
-                File.ReadAllText(Path.Combine(_folderPath, EnemyXpFileName)), serializerSettings)
+                BuffJson.Deserialize<List<EnemyXp>>(
+                File.ReadAllText(Path.Combine(_folderPath, EnemyXpFileName)))
                 : DefaultXpData.GetDefaultEnemyXp();
 
             if (enemyXpList is null || enemyXpList.Count == 0)
@@ -180,39 +169,38 @@ namespace GTFuckingXP.Managers
             //}
             
 
-            var levelLayouts = JsonSerializer.Deserialize<List<LevelLayout>>(
+            var levelLayouts = BuffJson.Deserialize<List<LevelLayout>>(
                 rundownExists 
                 ? File.ReadAllText(Path.Combine(_folderPath, LevelLayoutFileName))
-                : DefaultConstants.ClassLayouts, serializerSettings);
+                : DefaultConstants.ClassLayouts);
 
             if (levelLayouts is null || levelLayouts.Count == 0)
             {
                 LogManager.Warn("No Data found for XpLayouts/LevelLayouts!");
             }
 
-            var boosterEffects = JsonSerializer.Deserialize<List<BoosterBuffs>>(
+            var boosterEffects = BuffJson.Deserialize<List<BoosterBuffs>>(
                rundownExists
                 ? File.ReadAllText(Path.Combine(_folderPath, BoosterLayoutFileName))
-                : DefaultConstants.BoosterEffects, serializerSettings);
+                : DefaultConstants.BoosterEffects);
 
             if (boosterEffects is null || boosterEffects.Count == 0)
             {
                 LogManager.Warn("No Data found for BoosterEffectLayouts!");
             }
 
-            var groups = JsonSerializer.Deserialize<List<Group>>(
+            var groups = BuffJson.Deserialize<List<Group>>(
                 rundownExists
                 ? File.ReadAllText(Path.Combine(_folderPath, GroupFileName))
-                : DefaultConstants.Groups, serializerSettings);
+                : DefaultConstants.Groups);
             
             if(groups is null || groups.Count == 0)
             {
                 LogManager.Warn("No data found for Groups!");
             }
 
-            var globals = rundownExists ? JsonSerializer.Deserialize<GlobalValues>(
-                File.ReadAllText(Path.Combine(_folderPath, GlobalFileName)),
-                serializerSettings)
+            var globals = rundownExists ? BuffJson.Deserialize<GlobalValues>(
+                File.ReadAllText(Path.Combine(_folderPath, GlobalFileName)))
                 : new GlobalValues();
 
             if (globals is null)

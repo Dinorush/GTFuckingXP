@@ -1,4 +1,5 @@
-﻿using GTFuckingXP.Extensions.Information.Level.Json;
+﻿using GTFuckingXP.Enums;
+using GTFuckingXP.Extensions.Information.Level.Json;
 using GTFuckingXP.Information.NetworkingInfo;
 
 namespace GTFuckingXP.Information.Level
@@ -12,11 +13,11 @@ namespace GTFuckingXP.Information.Level
         { }
 
         public Level(LevelReachedInfo levelData) : this(levelData.LevelNumber, 0, levelData.HealthMultiplier, 0f, 0f,
-                null, BuffJson.Deserialize<List<CustomScalingBuff>>(levelData.CustomScaling))
+                null, levelData.GetCustomScaling())
         { }
 
-        public Level(int levelNumber, uint totalXp, float healthMultiplier, float meleeMultiplier, float weaponMultiplier, List<SingleUseBuff> singleUseBuffs,
-            List<CustomScalingBuff> customScaling, LocaleText customLevelUpPopupText = default, LocaleText customLevelStatsText = default)
+        public Level(int levelNumber, uint totalXp, float healthMultiplier, float meleeMultiplier, float weaponMultiplier, Dictionary<SingleBuff, float> singleUseBuffs,
+            Dictionary<CustomScaling, float> customScaling, LocaleText customLevelUpPopupText = default, LocaleText customLevelStatsText = default)
         {
             LevelNumber = levelNumber;
             TotalXpRequired = totalXp;
@@ -71,12 +72,12 @@ namespace GTFuckingXP.Information.Level
         /// <summary>
         /// Gets or sets all customscaling options
         /// </summary>
-        public List<CustomScalingBuff> CustomScaling { get; set; }
+        public Dictionary<CustomScaling, float> CustomScaling { get; set; }
 
         /// <summary>
         /// Gets or sets the single use buffs that gets applied when reaching this level.
         /// </summary>
-        public List<SingleUseBuff> LevelUpBonus { get; set; }
+        public Dictionary<SingleBuff, float> LevelUpBonus { get; set; }
 
         public override string ToString()
         {

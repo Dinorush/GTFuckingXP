@@ -3,6 +3,7 @@ using GTFuckingXP.Extensions.Information;
 using GTFuckingXP.Information.ClassSelector;
 using GTFuckingXP.Information.Level;
 using GTFuckingXP.Managers;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace GTFuckingXP.Extensions
@@ -153,6 +154,21 @@ namespace GTFuckingXP.Extensions
         public static Level GetActiveLevel()
         {
             return CacheApi.GetInformation<Level>(ActiveLevelKey, XpModCacheName);
+        }
+
+        public static bool TryGetActiveLevel(Player.PlayerAgent? player, [MaybeNullWhen(false)] out Level level)
+        {
+            if (player == null)
+            {
+                level = null;
+                return false;
+            }
+
+            if (player.IsLocallyOwned && CacheApi.TryGetInformation(ActiveLevelKey, out level, XpModCacheName, false))
+                return true;
+            else if (GetPlayerToLevelMapping().TryGetValue(player.PlayerSlotIndex, out level))
+                return true;
+            return false;
         }
 
         public static Level? GetActiveLevel(Player.PlayerAgent player)

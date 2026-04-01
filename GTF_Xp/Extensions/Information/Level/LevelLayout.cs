@@ -9,7 +9,7 @@ namespace GTFuckingXP.Information.Level
     /// </summary>
     public class LevelLayout
     {
-        public LevelLayout(int persistentId, LocaleText header, int groupPersistentId, LocaleText infoText, List<StartingBuff> startingBuffs, List<Level> levels)
+        public LevelLayout(int persistentId, LocaleText header, int groupPersistentId, LocaleText infoText, Dictionary<StartBuff, float> startingBuffs, List<Level> levels)
         {
             PersistentId = persistentId;
             GroupPersistentId = groupPersistentId;
@@ -44,7 +44,7 @@ namespace GTFuckingXP.Information.Level
         ///// </summary>
         //public Dictionary<AgentModifier, float> ConstantBoosterEffects { get; set; }
 
-        public List<StartingBuff>? StartingBuffs { get; set; }
+        public Dictionary<StartBuff, float>? StartingBuffs { get; set; }
 
         /// <summary>
         /// Gets or sets all levels containing in this layout.

@@ -1,10 +1,10 @@
-﻿using GTFuckingXP.Extensions;
-using HarmonyLib;
-using GTFuckingXP.Information.Level;
+﻿using Agents;
 using GTFuckingXP.Enums;
-using Agents;
-using Player;
+using GTFuckingXP.Extensions;
+using GTFuckingXP.Information.Level;
 using GTFuckingXP.Managers;
+using HarmonyLib;
+using Player;
 
 namespace GTFuckingXp.Patches
 {
@@ -19,29 +19,18 @@ namespace GTFuckingXp.Patches
             if (!player.Alive)
                 return;
 
-            Level? level;
-            if (player.IsLocallyOwned)
-                level = CacheApiWrapper.GetActiveLevel();
-            else
-                level = CacheApiWrapper.GetPlayerToLevelMapping().GetValueOrDefault(player.PlayerSlotIndex);
+            if (!CacheApiWrapper.TryGetActiveLevel(player, out var level)) return;
 
-            if (level != null)
-            {
-                CustomScalingBuff? buff = level.CustomScaling.FirstOrDefault(buff => buff.CustomBuff == CustomScaling.BulletResistance);
-                if (buff != null)
-                    dam *= 2f - buff.Value;
-            }
+            if (level.CustomScaling.TryGetValue(CustomScaling.BulletResistance, out var value))
+                dam *= 2f - value;
 
-            if (sourceAgent != null)
+            if (player.IsLocallyOwned && !SentryGunCheckPatches.SentryShot)
             {
-                if (sourceAgent.IsLocallyOwned && !SentryGunCheckPatches.SentryShot)
-                {
-                    var damage = dam;
-                    LogManager.Debug($"Bullet damage from local player registered. {damage} was scaled up to:");
-                    damage *= CacheApiWrapper.GetActiveLevel().WeaponDamageMultiplier;
-                    LogManager.Debug($"{damage}");
-                    dam = damage;
-                }
+                var damage = dam;
+                LogManager.Debug($"Bullet damage from local player registered. {damage} was scaled up to:");
+                damage *= level.WeaponDamageMultiplier;
+                LogManager.Debug($"{damage}");
+                dam = damage;
             }
         }
 
@@ -55,9 +44,8 @@ namespace GTFuckingXp.Patches
 
             if (!player.Alive || !player.IsLocallyOwned) return;
 
-            CustomScalingBuff? buff = CacheApiWrapper.GetActiveLevel().CustomScaling.FirstOrDefault(buff => buff.CustomBuff == CustomScaling.BleedResistance);
-            if (buff != null)
-                dam *= 2f - buff.Value;
+            if (CacheApiWrapper.GetActiveLevel().CustomScaling.TryGetValue(CustomScaling.BulletResistance, out var value))
+                dam *= 2f - value;
         }
 
         // Dam_PlayerDamageBase does not override ExplosionDamage
@@ -67,15 +55,11 @@ namespace GTFuckingXp.Patches
         {
             if (__instance.DamageBaseOwner != DamageBaseOwnerType.Player) return;
             PlayerAgent player = __instance.GetBaseAgent().Cast<PlayerAgent>();
-            Level level;
-            if (player.IsLocallyOwned)
-                level = CacheApiWrapper.GetActiveLevel();
-            else if (!CacheApiWrapper.GetPlayerToLevelMapping().TryGetValue(player.PlayerSlotIndex, out level!))
-                return;
 
-            CustomScalingBuff? buff = level.CustomScaling.FirstOrDefault(buff => buff.CustomBuff == CustomScaling.ExplosionResistance);
-            if (buff != null)
-                dam *= 2f - buff.Value;
+            if (!CacheApiWrapper.TryGetActiveLevel(player, out var level)) return;
+
+            if (level.CustomScaling.TryGetValue(CustomScaling.ExplosionResistance, out var value))
+                dam *= 2f - value;
         }
     }
 }
