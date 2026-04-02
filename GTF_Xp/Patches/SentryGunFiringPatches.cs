@@ -29,7 +29,7 @@ namespace GTFuckingXP.Patches
             core.CostOfBullet /= capMod;
         }
 
-        [HarmonyPatch(nameof(SentryGunInstance.GiveAmmoRel))]
+        [HarmonyPatch(typeof(SentryGunInstance), nameof(SentryGunInstance.GiveAmmoRel))]
         [HarmonyWrapSafe]
         [HarmonyPrefix]
         private static void PrefixSentryAmmo(SentryGunInstance __instance, ref float ammoClassRel)
