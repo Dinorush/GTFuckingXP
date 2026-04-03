@@ -19,9 +19,6 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
         static BuffJson()
         {
             _setting.Converters.Add(new JsonStringEnumConverter());
-            _setting.Converters.Add(new CustomBuffConverter());
-            _setting.Converters.Add(new SingleBuffConverter());
-            _setting.Converters.Add(new StartBuffConverter());
             _setting.Converters.Add(new LegacyBuffConverter<CustomScaling>());
             _setting.Converters.Add(new LegacyBuffConverter<SingleBuff>());
             _setting.Converters.Add(new LegacyBuffConverter<StartBuff>());

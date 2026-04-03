@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using GTFuckingXP.Managers;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace GTFuckingXP.Extensions.Information.Level.Json
@@ -6,6 +7,7 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
     public sealed class LegacyBuffConverter<T> : JsonConverter<Dictionary<T, float>> where T : struct, Enum
     {
         private static readonly string TypeName = typeof(T).Name;
+        private static readonly T InvalidValue = (T)Enum.ToObject(typeof(T), -1);
         public override Dictionary<T, float>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (TryLegacyRead(ref reader, out var result))
@@ -35,7 +37,7 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
                 if (reader.TokenType == JsonTokenType.EndObject)
                     continue;
 
-                if (reader.TokenType != JsonTokenType.PropertyName) throw new JsonException($"LegacyFormat: Expected {TypeName} name or \"{TypeName}\" property");
+                if (reader.TokenType != JsonTokenType.PropertyName) throw new JsonException($"LegacyFormat: Expected {TypeName} name or object property, found {reader.TokenType}");
 
                 string name = reader.GetString()!;
                 float value = 1f;
@@ -43,7 +45,7 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
                 if (name.TryToEnum(out T buff))
                 {
                     reader.Read();
-                    if (reader.TokenType != JsonTokenType.Number) throw new JsonException($"LegacyFormat: Expected {TypeName} name to be followed by a value");
+                    if (reader.TokenType != JsonTokenType.Number) throw new JsonException($"LegacyFormat: Expected {TypeName} name to be followed by a value, found {reader.TokenType}");
 
                     value = reader.GetSingle();
                     reader.Read();
@@ -52,7 +54,7 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
                 {
                     do
                     {
-                        if (reader.TokenType != JsonTokenType.PropertyName) throw new JsonException($"LegacyFormat: Expected \"{TypeName}\" property");
+                        if (reader.TokenType != JsonTokenType.PropertyName) throw new JsonException($"LegacyFormat: Expected {TypeName} object property, found {reader.TokenType}");
 
                         name = reader.GetString()!;
                         reader.Read();
@@ -62,13 +64,24 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
                                 value = reader.GetSingle();
                                 break;
                             default:
-                                if (reader.TokenType == JsonTokenType.String)
+                                if (!name.EndsWith("Buff"))
                                 {
-                                    if (!reader.GetString().TryToEnum(out buff))
-                                        throw new JsonException($"LegacyFormat: Unable to get {TypeName} for string {reader.GetString()}");
+                                    LogManager.Warn($"LegacyFormat: Expected {TypeName}:Value format or \"---Buff\" field for {TypeName} object format, found \"{name}\"! Skipping...");
+                                    buff = InvalidValue;
+                                    break;
                                 }
-                                else
-                                    buff = (T)Enum.ToObject(typeof(T), reader.GetInt32());
+
+                                if (reader.TokenType != JsonTokenType.String)
+                                {
+                                    if (!reader.TryGetInt32(out var enumVal))
+                                        throw new JsonException($"LegacyFormat: Unable to read int enum value from \"{reader.GetString()}\" when parsing {TypeName}! (Field name: \"{name}\")");
+                                    buff = (T)Enum.ToObject(typeof(T), enumVal);
+                                }
+                                else if (!reader.GetString().TryToEnum(out buff))
+                                {
+                                    LogManager.Warn($"LegacyFormat: Unable to get {TypeName} type for \"{reader.GetString()}\"! Skipping...");
+                                    buff = InvalidValue;
+                                }
                                 break;
                         }
                     } while (reader.Read() && reader.TokenType != JsonTokenType.EndObject);
@@ -77,10 +90,10 @@ namespace GTFuckingXP.Extensions.Information.Level.Json
                 if (reader.TokenType == JsonTokenType.EndObject)
                     result.TryAdd(buff, value);
                 else
-                    throw new JsonException($"LegacyFormat: Expected EndObject token when parsing {TypeName}");
+                    throw new JsonException($"LegacyFormat: Expected EndObject token when parsing {TypeName}, found {reader.TokenType}");
             }
 
-            throw new JsonException($"LegacyFormat: Expected EndArray token when parsing {TypeName}");
+            throw new JsonException($"LegacyFormat: Expected EndArray token when parsing {TypeName}, found {reader.TokenType}");
         }
 
         public override void Write(Utf8JsonWriter writer, Dictionary<T, float> value, JsonSerializerOptions options)
