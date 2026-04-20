@@ -38,17 +38,24 @@ namespace GTFuckingXP.Managers
             switch (customBuff)
             {
                 case CustomScaling.MeleeRangeMultiplier:
-                    var meleeData = GetLocalMeleeWeapon().MeleeArchetypeData;
-                    if (!CacheApiWrapper.TryGetDefaultCustomScaling(customBuff, out float meleeRange))
+                    if (!CacheApiWrapper.TryGetDefaultCustomScaling(customBuff, out IStatModifier rangeModifier))
                     {
-                        meleeRange = meleeData.CameraDamageRayLength;
-                        CacheApiWrapper.SetDefaultCustomScaling(customBuff, meleeRange);
-                    }
+                        if (value == 1f) break;
 
-                    meleeData.CameraDamageRayLength = meleeRange * value;
+                        rangeModifier = MeleeRangeAPI.AddModifier(value);
+                        CacheApiWrapper.SetDefaultCustomScaling(customBuff, rangeModifier);
+                    }
+                    else if (value == 1f)
+                    {
+                        rangeModifier.Disable();
+                    }
+                    else
+                    {
+                        rangeModifier.Enable(value);
+                    }
                     break;
                 case CustomScaling.MeleeHitBoxSizeMultiplier:
-                    meleeData = GetLocalMeleeWeapon().MeleeArchetypeData;
+                    var meleeData = GetLocalMeleeWeapon().MeleeArchetypeData;
                     if (!CacheApiWrapper.TryGetDefaultCustomScaling(customBuff, out float meleeHitbox))
                     {
                         meleeHitbox = meleeData.AttackSphereRadius;

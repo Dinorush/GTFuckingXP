@@ -173,6 +173,9 @@ namespace GTFuckingXP.Extensions
 
         public static Level? GetActiveLevel(Player.PlayerAgent player)
         {
+            if (player == null)
+                return null;
+
             if (player.IsLocallyOwned)
                 return GetActiveLevel();
 
