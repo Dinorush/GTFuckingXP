@@ -1,15 +1,16 @@
 ﻿using CellMenu;
-using HarmonyLib;
+using EndskApi.Api;
+using FluffyUnderware.DevTools;
 using GTFuckingXP.Extensions;
+using GTFuckingXP.Information.ClassSelector;
+using GTFuckingXP.Information.Level;
 using GTFuckingXP.Managers;
+using HarmonyLib;
+using Localization;
+using SNetwork;
 using System;
 using System.Collections.Generic;
-using GTFuckingXP.Information.Level;
-using Localization;
-using GTFuckingXP.Information.ClassSelector;
 using System.Linq;
-using EndskApi.Api;
-using SNetwork;
 
 namespace GTFuckingXP.Patches.SelectLevelPatches
 {
@@ -82,10 +83,11 @@ namespace GTFuckingXP.Patches.SelectLevelPatches
             var scrollItem = CacheApi.GetInformation<CM_LobbyScrollItem>(__instance.GetInstanceID(), CacheApiWrapper.XpModCacheName);
             if (__instance.m_player.IsLocal)
             {
+                var className = CacheApiWrapper.TryGetCurrentLevelLayout(out var layout) ? layout.Header : "Default";
                 scrollItem.gameObject.SetActive(!hide);
                 foreach (var text in scrollItem.GetTexts())
                 {
-                    text.text = "Class selector";
+                    text.text = $"Class: {className}";
                     text.ForceMeshUpdate();
                 }
             }
@@ -181,6 +183,13 @@ namespace GTFuckingXP.Patches.SelectLevelPatches
                         content.IsSelected = true;
                         SelectItem(content, selected);
                         selected = content;
+                        var scrollItem = CacheApi.GetInformation<CM_LobbyScrollItem>(lobbyBar.GetInstanceID(), CacheApiWrapper.XpModCacheName);
+                        var className = layout.Header;
+                        foreach (var text in scrollItem.GetTexts())
+                        {
+                            text.text = $"Class: {className}";
+                            text.ForceMeshUpdate();
+                        }
 
                         CoroutineManager.BlinkIn(content.gameObject);
 

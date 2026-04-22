@@ -50,5 +50,22 @@ namespace GTFuckingXP.Information.Level
         /// Gets or sets all levels containing in this layout.
         /// </summary>
         public List<Level> Levels { get; set; }
+
+        /// <summary>
+        /// When JSON reading is done, force Levels into ascending, consecutive order.
+        /// </summary>
+        public void OnReadDone()
+        {
+            Levels.Sort((a, b) => a.LevelNumber == b.LevelNumber ? 0 : (a.LevelNumber < b.LevelNumber ? -1 : 1));
+            for (int i = 0; i < Levels.Count; i++)
+                Levels[i].LevelNumber = i;
+        }
+
+        public Level? GetLevel(int index)
+        {
+            if (index < Levels.Count)
+                return Levels[index];
+            return null;
+        }
     }
 }

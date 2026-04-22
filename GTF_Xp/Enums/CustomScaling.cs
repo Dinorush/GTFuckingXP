@@ -2,7 +2,6 @@
 {
     public enum CustomScaling
     {
-        NetworkBreak = -999,
         Invalid = -1,
         MeleeRangeMultiplier,
         MeleeHitBoxSizeMultiplier,

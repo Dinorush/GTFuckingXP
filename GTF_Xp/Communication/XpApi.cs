@@ -27,8 +27,7 @@ namespace GTFuckingXP.Communication
                 //There is no real need to change the current Levellayout, this information is only set while in an expedition.
                 if (CacheApi.TryGetInformation<LevelLayout>(CacheApiWrapper.LevelLayoutKey, out var levelLayout, CacheApiWrapper.XpModCacheName, logNotFound: false))
                 {
-                    var lvls = CacheApi.GetInstance<List<LevelLayout>>(CacheApiWrapper.XpModCacheName);
-                    var newLevelLayout = lvls.FirstOrDefault(it => it.Header == levelLayout.Header);
+                    var newLevelLayout = CacheApiWrapper.GetLevelLayout(levelLayout.PersistentId);
 
                     var oldActiveLevel = CacheApiWrapper.GetActiveLevel();
 
@@ -105,14 +104,14 @@ namespace GTFuckingXP.Communication
                 var levelLayout = CacheApiWrapper.GetCurrentLevelLayout();
                 var xpHandler = CacheApi.GetInstance<XpHandler>(CacheApiWrapper.XpModCacheName);
 
-                var newLevel = levelLayout.Levels.First(it => it.LevelNumber == levelNumber);
+                var newLevel = levelLayout.Levels[levelNumber];
 
                 xpHandler.ChangeCurrentLevel(newLevel, BoosterBuffManager.Instance.GetFittingBoosterBuff(levelLayout.PersistentId, newLevel.LevelNumber));
 
                 cheatedXp = (int)newLevel.TotalXpRequired - (int)xpHandler.CurrentTotalXp;
 
                 xpHandler.CurrentTotalXp = newLevel.TotalXpRequired + 1;
-                xpHandler.NextLevel = levelLayout.Levels.FirstOrDefault(it => it.LevelNumber == levelNumber + 1);
+                xpHandler.NextLevel = levelLayout.GetLevel(levelNumber + 1);
                 CacheApi.GetInstance<XpBar>(CacheApiWrapper.XpModCacheName).UpdateUiString(CacheApiWrapper.GetActiveLevel(), xpHandler.NextLevel, xpHandler.CurrentTotalXp, levelLayout.Header);
             }
             catch (Exception e)
@@ -134,7 +133,7 @@ namespace GTFuckingXP.Communication
         {
             try
             {
-                var newLevelLayout = CacheApi.GetInstance<List<LevelLayout>>(CacheApiWrapper.XpModCacheName).First(it => it.Header == header);
+                var newLevelLayout = CacheApiWrapper.GetLevelLayouts().First(it => it.Header == header);
                 return ChangeCurrentLevelLayout(newLevelLayout);
             }
             catch (Exception e)

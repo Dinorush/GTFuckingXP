@@ -73,17 +73,17 @@ namespace GTFuckingXP.Managers
                 return false;
             }
 
-            var levelLayouts = CacheApi.GetInstance<List<LevelLayout>>(CacheApiWrapper.XpModCacheName);
-            layout = _loadedLayout = levelLayouts.Find(l => l.PersistentId == data.LayoutID);
+            var levelLayouts = CacheApi.GetInstance<Dictionary<int, LevelLayout>>(CacheApiWrapper.XpModCacheName);
+            layout = _loadedLayout = levelLayouts.GetValueOrDefault(data.LayoutID);
             return CheckValidLayout();
         }
 
         private static bool CheckValidLayout() => CheckValidLayout(_loadedLayout);
-        public static bool CheckValidLayout(LevelLayout layout)
+        public static bool CheckValidLayout(LevelLayout? layout)
         {
-            if (_loadedLayout == null) return false;
+            if (layout == null) return false;
             
-            var groupID = _loadedLayout.GroupPersistentId;
+            var groupID = layout.GroupPersistentId;
             var groups = CacheApi.GetInstance<List<Group>>(CacheApiWrapper.XpModCacheName);
             var parentGroup = groups.Find(group => group.PersistentId == groupID);
             return parentGroup != null && parentGroup.AllowedForCount(SNet.SessionHub.PlayersInSession.Count);

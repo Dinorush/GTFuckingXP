@@ -31,7 +31,7 @@ namespace GTFuckingXP.Scripts
         /// <param name="nextLevel">The stats to receive when reaching next level.</param>
         /// <param name="currentTotalXp">The current total xp.</param>
         [HideFromIl2Cpp]
-        public void UpdateUiString(Level currentLevel, Level nextLevel, uint currentTotalXp, string header)
+        public void UpdateUiString(Level currentLevel, Level? nextLevel, uint currentTotalXp, string header)
         {
             var stringBuilder = new StringBuilder();
             string statsString;

@@ -74,7 +74,7 @@ namespace GTFuckingXP.Managers
             _initialized = true;
 
             //Initializing some static values
-            CacheApiWrapper.SetPlayerToLevelMapping(new Dictionary<int, Level>());
+            CacheApiWrapper.InitPlayerMapping();
            
             CacheApiWrapper.SetDefaultMaxHp(PlayerDataBlock.GetBlock(1).health);
             
@@ -141,7 +141,7 @@ namespace GTFuckingXP.Managers
             CacheApiWrapper.KillScript<XpHandler>();
             CacheApiWrapper.KillScript<XpBar>();
             CacheApiWrapper.KillScript<DevModeTools>();
-            CacheApiWrapper.SetPlayerToLevelMapping(new Dictionary<int, Level>());
+            CacheApiWrapper.InitPlayerMapping();
             CustomScalingBuffManager.ResetCustomBuffs();
             CustomScalingBuffManager.ClearDefaultCustomBuffs();
         }
@@ -178,11 +178,16 @@ namespace GTFuckingXP.Managers
             {
                 LogManager.Warn("No Data found for XpLayouts/LevelLayouts!");
             }
+            else
+            {
+                foreach (var layout in levelLayouts)
+                    layout.OnReadDone();
+            }
 
             var boosterEffects = BuffJson.Deserialize<List<BoosterBuffs>>(
-               rundownExists
-                ? File.ReadAllText(Path.Combine(_folderPath, BoosterLayoutFileName))
-                : DefaultConstants.BoosterEffects);
+                   rundownExists
+                    ? File.ReadAllText(Path.Combine(_folderPath, BoosterLayoutFileName))
+                    : DefaultConstants.BoosterEffects);
 
             if (boosterEffects is null || boosterEffects.Count == 0)
             {
@@ -223,6 +228,12 @@ namespace GTFuckingXP.Managers
             CacheApi.SaveInstance(newData.boosterBuffs, CacheApiWrapper.XpModCacheName);
             CacheApi.SaveInstance(newData.groups, CacheApiWrapper.XpModCacheName);
             CacheApi.SaveInstance(newData.globals, CacheApiWrapper.XpModCacheName);
+
+            Dictionary<int, LevelLayout> uniqueLayouts = new(newData.levelLayouts.Count);
+            foreach (var levelLayout in newData.levelLayouts)
+                if (!uniqueLayouts.TryAdd(levelLayout.PersistentId, levelLayout))
+                    LogManager.Warn($"Detected duplicate level layout ID {levelLayout.PersistentId} - {levelLayout.Header} & {uniqueLayouts[levelLayout.PersistentId].Header}");
+            CacheApi.SaveInstance(uniqueLayouts, CacheApiWrapper.XpModCacheName);
         }
 
         public string GetFolderPath()

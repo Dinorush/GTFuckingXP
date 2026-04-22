@@ -25,6 +25,8 @@ namespace GTFuckingXP.Extensions
         private const string LvlUpCallbackKey = "LvlUpCallbackKey";
         private const string ScriptsStartedCallbackKey = "ScriptsStartedCallback";
         private static readonly Dictionary<int, LevelLayout> DefaultLayouts = new();
+        private static ActiveLevel ActiveLocalLevel;
+        private static readonly Dictionary<int, ActiveLevel> ActiveClientLevels = new();
 
         /// <summary>
         /// Creates a new component of type <typeparamref name="Tscript"/> and saves it into the cache.
@@ -94,7 +96,7 @@ namespace GTFuckingXP.Extensions
             if (DefaultLayouts.TryGetValue(playerCount, out var layout))
                 return layout;
 
-            var layouts = CacheApi.GetInstance<List<LevelLayout>>(XpModCacheName);
+            var layouts = GetLevelLayouts();
             if (playerCount == 0)
                 return DefaultLayouts[playerCount] = layouts[0];
                 
@@ -118,12 +120,25 @@ namespace GTFuckingXP.Extensions
         {
             LogManager.Debug($"Set current level layout to {levelLayout.Header}.");
             CacheApi.SaveInformation(LevelLayoutKey, levelLayout, XpModCacheName);
+            ActiveLocalLevel.Layout = levelLayout;
         }
 
         public static LevelLayout GetCurrentLevelLayout()
         {
             return CacheApi.GetInformation<LevelLayout>(LevelLayoutKey, XpModCacheName);
         }
+
+        public static LevelLayout GetLevelLayout(int id)
+        {
+            return CacheApi.GetInstance<Dictionary<int, LevelLayout>>(XpModCacheName)[id];
+        }
+
+        public static bool TryGetLevelLayout(int id, [MaybeNullWhen(false)] out LevelLayout layout)
+        {
+            return CacheApi.GetInstance<Dictionary<int, LevelLayout>>(XpModCacheName).TryGetValue(id, out layout);
+        }
+
+        public static List<LevelLayout> GetLevelLayouts() => CacheApi.GetInstance<List<LevelLayout>>(XpModCacheName);
 
         public static bool TryGetCurrentLevelLayout(out LevelLayout levelLayout)
         {
@@ -135,6 +150,8 @@ namespace GTFuckingXP.Extensions
         /// </summary>
         public static void SetActiveLevel(Level newLevel, bool sendToOtherPeople = true)
         {
+            ActiveLocalLevel.Level = newLevel;
+            ActiveLocalLevel.LevelNumber = newLevel.LevelNumber;
             LogManager.Debug($"Setting new level to {newLevel.LevelNumber}.");
             CacheApi.SaveInformation(ActiveLevelKey, newLevel, XpModCacheName);
             if (sendToOtherPeople)
@@ -146,6 +163,24 @@ namespace GTFuckingXP.Extensions
             {
                 callBack.Invoke(newLevel);
             }
+        }
+
+        public static bool TryGetFullActiveLevel(Player.PlayerAgent? player, [MaybeNullWhen(false)] out ActiveLevel activeLevel)
+        {
+            if (player == null)
+            {
+                activeLevel = default;
+                return false;
+            }
+
+            if (player.IsLocallyOwned)
+            {
+                activeLevel = ActiveLocalLevel;
+                return true;
+            }
+            else if (ActiveClientLevels.TryGetValue(player.PlayerSlotIndex, out activeLevel))
+                return true;
+            return false;
         }
 
         /// <summary>
@@ -198,14 +233,26 @@ namespace GTFuckingXP.Extensions
         /// <summary>
         /// Sets the player to index map dictionary in the <paramref name="instanceCache"/>.
         /// </summary>
-        public static void SetPlayerToLevelMapping(Dictionary<int, Level> playerToLevelMap)
+        public static void InitPlayerMapping()
         {
-            CacheApi.SaveInformation(PlayerSlotToLevelIndexMappingKey, playerToLevelMap, XpModCacheName);
+            CacheApi.SaveInformation(PlayerSlotToLevelIndexMappingKey, new Dictionary<int, Level>(), XpModCacheName);
+            ActiveClientLevels.Clear();
         }
 
         public static Dictionary<int, Level> GetPlayerToLevelMapping()
         {
             return CacheApi.GetInformation<Dictionary<int, Level>>(PlayerSlotToLevelIndexMappingKey, XpModCacheName);
+        }
+
+        public static Dictionary<int, ActiveLevel> GetPlayerToActiveLevelMapping()
+        {
+            return ActiveClientLevels;
+        }
+
+        public static void SetPlayerActiveLevel(int slot, ActiveLevel activeLevel)
+        {
+            GetPlayerToLevelMapping()[slot] = activeLevel.Level;
+            ActiveClientLevels[slot] = activeLevel;
         }
 
         public static void SetXpStorageData(uint knownXpState)

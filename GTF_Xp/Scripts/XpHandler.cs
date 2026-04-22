@@ -40,7 +40,7 @@ namespace GTFuckingXP.Scripts
         /// Gets the stats for the next level.
         /// </summary>
         [HideFromIl2Cpp]
-        public Level NextLevel { get; internal set; }
+        public Level? NextLevel { get; internal set; }
 
         /// <summary>
         /// Gets if you're already max level.
@@ -63,8 +63,8 @@ namespace GTFuckingXP.Scripts
                     CacheApiWrapper.SetCurrentLevelLayout(levelLayout);
                 }
 
-                var newActiveLevel = levelLayout.Levels.First(it => it.LevelNumber == 0);
-                NextLevel = levelLayout.Levels.FirstOrDefault(it => it.LevelNumber == newActiveLevel.LevelNumber + 1);
+                var newActiveLevel = levelLayout.Levels[0];
+                NextLevel = levelLayout.GetLevel(newActiveLevel.LevelNumber + 1);
                 CurrentTotalXp = 0;
                 ChangeCurrentLevel(newActiveLevel, BoosterBuffManager.Instance.GetFittingBoosterBuff(levelLayout.PersistentId, newActiveLevel.LevelNumber));
                 CacheApi.GetInstance<XpBar>(CacheApiWrapper.XpModCacheName).UpdateUiString(CacheApiWrapper.GetActiveLevel(), NextLevel, CurrentTotalXp, levelLayout.Header);
@@ -119,21 +119,17 @@ namespace GTFuckingXP.Scripts
             }
 
             var oldLevel = CacheApiWrapper.GetActiveLevel();
-            var availableLevels = levels.Levels.Where(it => it.LevelNumber > CacheApiWrapper.GetActiveLevel().LevelNumber && it.TotalXpRequired <= CurrentTotalXp);
-
-            if (availableLevels.Count() > 0)
+            if (NextLevel!.TotalXpRequired <= CurrentTotalXp)
             {
-                var newLevel = availableLevels.OrderByDescending(it => it.LevelNumber).First();
-                foreach (var level in availableLevels)
+                var newLevel = NextLevel;
+                while (NextLevel != null && NextLevel.TotalXpRequired <= CurrentTotalXp)
                 {
-                    if (level.LevelNumber == newLevel.LevelNumber) continue;
-                    if (level.LevelNumber == oldLevel.LevelNumber) break;
-
-                    ApplySingleUseBuffs(level);
+                    ApplySingleUseBuffs(NextLevel);
+                    newLevel = NextLevel;
+                    NextLevel = levels.GetLevel(newLevel.LevelNumber + 1);
                 }
 
                 ChangeCurrentLevel(newLevel, BoosterBuffManager.Instance.GetFittingBoosterBuff(levels.PersistentId, newLevel.LevelNumber));
-                NextLevel = levels.Levels.FirstOrDefault(it => it.LevelNumber == newLevel.LevelNumber + 1);
 
                 if (BepInExLoader.LvlUpPopups.Value)
                 {
@@ -163,7 +159,7 @@ namespace GTFuckingXP.Scripts
             var levelLayout = CacheApiWrapper.GetCurrentLevelLayout();
             CurrentTotalXp = totalXp;
             var level = levelLayout.Levels.OrderByDescending(it => it.LevelNumber).First(it => it.TotalXpRequired <= CurrentTotalXp);
-            NextLevel = levelLayout.Levels.FirstOrDefault(it => it.LevelNumber == level.LevelNumber + 1);
+            NextLevel = levelLayout.GetLevel(level.LevelNumber + 1);
             var boosterBuffs = BoosterBuffManager.Instance.GetFittingBoosterBuff(levelLayout.PersistentId, level.LevelNumber);
             ChangeCurrentLevel(level, boosterBuffs, applyLevelBonuses: false);
             CacheApi.GetInstance<XpBar>(CacheApiWrapper.XpModCacheName).UpdateUiString(CacheApiWrapper.GetActiveLevel(), NextLevel, CurrentTotalXp, levelLayout.Header);

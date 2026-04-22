@@ -119,13 +119,21 @@ namespace GTFuckingXP.Managers
                 {
                     if(player.PlayerSlotIndex == snet.PlayerSlotIndex())
                     {
-                        Level level = new Level(levelData);
+                        Level level;
+                        if (!CacheApiWrapper.TryGetLevelLayout(levelData.LayoutID, out var layout))
+                        {
+                            LogManager.Warn($"Unable to retrieve level layout for {snet.NickName}!");
+                            layout = CacheApiWrapper.GetLevelLayouts()[0];
+                            level = layout.Levels[0];
+                        }
+                        else
+                            level = layout.GetLevel(levelData.LevelNumber) ?? layout.Levels[0];
 
                         var newHealth = level.HealthMultiplier * CacheApiWrapper.GetDefaultMaxHp();
                         LogManager.Debug($"Setting HP of {player.name} to {newHealth}");
                         player.Damage.HealthMax = newHealth;
 
-                        CacheApiWrapper.GetPlayerToLevelMapping()[player.PlayerSlotIndex] = level;
+                        CacheApiWrapper.SetPlayerActiveLevel(player.PlayerSlotIndex, new(layout, level.LevelNumber));
                     }
                 }
             }
@@ -164,7 +172,7 @@ namespace GTFuckingXP.Managers
 
         public static void SendNewLevelActive(Level newLevel)
         {
-            NetworkAPI.InvokeEvent(_levelStatsDistribution, new LevelReachedInfo(newLevel.LevelNumber, newLevel.HealthMultiplier, newLevel.CustomScaling));
+            NetworkAPI.InvokeEvent(_levelStatsDistribution, new LevelReachedInfo(CacheApiWrapper.GetCurrentLevelLayout().PersistentId, newLevel.LevelNumber));
         }
 
         public static void SendBoosterStatsReached(BoosterInfo boosterInfo)

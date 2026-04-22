@@ -10,11 +10,17 @@ namespace GTFuckingXP.Information.Level
     public class Level
     {
         public Level()
-        { }
-
-        public Level(LevelReachedInfo levelData) : this(levelData.LevelNumber, 0, levelData.HealthMultiplier, 0f, 0f,
-                null, levelData.GetCustomScaling())
-        { }
+        {
+            LevelNumber = 0;
+            TotalXpRequired = 0;
+            CustomLevelUpPopupText = new();
+            CustomLevelStatsText = new();
+            HealthMultiplier = 1f;
+            WeaponDamageMultiplier = 1f;
+            MeleeDamageMultiplier = 1f;
+            CustomScaling = new();
+            LevelUpBonus = new();
+        }
 
         public Level(int levelNumber, uint totalXp, float healthMultiplier, float meleeMultiplier, float weaponMultiplier, Dictionary<SingleBuff, float> singleUseBuffs,
             Dictionary<CustomScaling, float> customScaling, LocaleText customLevelUpPopupText = default, LocaleText customLevelStatsText = default)

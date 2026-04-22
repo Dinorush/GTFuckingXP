@@ -8,14 +8,17 @@ namespace GTFuckingXP.Patches
     {
         [HarmonyPatch(nameof(PlaceNavMarkerOnGO.UpdateName))]
         [HarmonyPrefix]
-        public static void UpdateNamePrefix(PlaceNavMarkerOnGO __instance, ref string name)
+        public static void UpdateNamePrefix(PlaceNavMarkerOnGO __instance, ref string name, string extraInfo)
         {
-            if (__instance.m_player == null) return;
+            var player = __instance.m_player;
+            if (player == null || player.Owner.IsBot) return;
 
-            var playerToLevelMap = CacheApiWrapper.GetPlayerToLevelMapping();
-            if (playerToLevelMap.TryGetValue(__instance.m_player.PlayerSlotIndex, out var levelNumber))
+            if (CacheApiWrapper.TryGetFullActiveLevel(player, out var level))
             {
-                name = $"<color=#{BepInExLoader.LevelColor.Value}>Lv.{levelNumber.LevelNumber}</color> {name}";
+                if (!string.IsNullOrEmpty(extraInfo))
+                    name = $"{name}\n<color=#{BepInExLoader.LevelColor.Value}>{level.Layout.Header} Lv.{level.LevelNumber}</color>";
+                else
+                    name = $"<color=#{BepInExLoader.LevelColor.Value}>Lv.{level.LevelNumber}</color> {name}";
             }
         }
     }
