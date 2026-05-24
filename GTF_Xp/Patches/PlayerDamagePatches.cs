@@ -19,16 +19,17 @@ namespace GTFuckingXp.Patches
             if (!player.Alive)
                 return;
 
-            if (!CacheApiWrapper.TryGetActiveLevel(player, out var level)) return;
+            if (CacheApiWrapper.TryGetActiveLevel(player, out var level))
+            {
+                if (level.CustomScaling.TryGetValue(CustomScaling.BulletResistance, out var value))
+                    dam *= 2f - value;
+            }
 
-            if (level.CustomScaling.TryGetValue(CustomScaling.BulletResistance, out var value))
-                dam *= 2f - value;
-
-            if (player.IsLocallyOwned && !SentryGunCheckPatches.SentryShot)
+            if (!SentryGunCheckPatches.SentryShot && sourceAgent != null && sourceAgent.IsLocallyOwned)
             {
                 var damage = dam;
                 LogManager.Debug($"Bullet damage from local player registered. {damage} was scaled up to:");
-                damage *= level.WeaponDamageMultiplier;
+                damage *= CacheApiWrapper.GetActiveLevel().WeaponDamageMultiplier;
                 LogManager.Debug($"{damage}");
                 dam = damage;
             }
