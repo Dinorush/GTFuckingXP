@@ -1,6 +1,5 @@
 ﻿using GTFuckingXP.Enums;
 using GTFuckingXP.Extensions;
-using GTFuckingXP.Information.Level;
 using HarmonyLib;
 using Player;
 

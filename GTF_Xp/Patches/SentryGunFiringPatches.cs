@@ -1,19 +1,17 @@
 ﻿using GTFuckingXP.Extensions;
-using GTFuckingXP.Information.Level;
 using HarmonyLib;
-using Player;
 
 namespace GTFuckingXP.Patches
 {
-    [HarmonyPatch(typeof(SentryGunInstance_Firing_Bullets))]
+    [HarmonyPatch(typeof(SentryGunInstance))]
     internal static class SentryGunFiringPatches
     {
-        [HarmonyPatch(nameof(SentryGunInstance_Firing_Bullets.UpdateAmmo))]
+        [HarmonyPatch(nameof(SentryGunInstance.CalcCostOfBullet))]
         [HarmonyWrapSafe]
-        [HarmonyPrefix]
-        private static void PrefixSentryAmmo(SentryGunInstance_Firing_Bullets __instance)
+        [HarmonyPostfix]
+        private static void PostfixCostOfBullet(SentryGunInstance __instance, ref float __result)
         {
-            if (!CacheApiWrapper.TryGetActiveLevel(__instance.m_core.Owner, out var level)) return;
+            if (!CacheApiWrapper.TryGetActiveLevel(__instance.Owner, out var level)) return;
 
             float capMod = 1f;
             if (level.CustomScaling.TryGetValue(Enums.CustomScaling.ToolEfficiency, out var value))
@@ -23,13 +21,10 @@ namespace GTFuckingXP.Patches
 
             if (capMod == 1f) return;
 
-            var core = __instance.m_core.Cast<SentryGunInstance>();
-            // Cost of bullet updates every update before UpdateAmmo so don't need to worry about double calcs.
-            // Apparently correctly modifies ammo shown on deployed sentry screen??? I have no idea how.
-            core.CostOfBullet /= capMod;
+            __result /= capMod;
         }
 
-        [HarmonyPatch(typeof(SentryGunInstance), nameof(SentryGunInstance.GiveAmmoRel))]
+        [HarmonyPatch(nameof(SentryGunInstance.GiveAmmoRel))]
         [HarmonyWrapSafe]
         [HarmonyPrefix]
         private static void PrefixSentryAmmo(SentryGunInstance __instance, ref float ammoClassRel)

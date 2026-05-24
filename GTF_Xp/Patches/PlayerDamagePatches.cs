@@ -37,14 +37,14 @@ namespace GTFuckingXp.Patches
         // Dam_PlayerDamageBase does not override FireDamage
         [HarmonyPatch(typeof(Dam_SyncedDamageBase), nameof(Dam_SyncedDamageBase.FireDamage))]
         [HarmonyPrefix]
-        private static void Prefix_FireDamage(Dam_SyncedDamageBase __instance, ref float dam, Agent sourceAgent)
+        private static void Prefix_FireDamage(Dam_SyncedDamageBase __instance, ref float dam)
         {
             if (__instance.DamageBaseOwner != DamageBaseOwnerType.Player) return;
             PlayerAgent player = __instance.GetBaseAgent().Cast<PlayerAgent>();
 
             if (!player.Alive || !player.IsLocallyOwned) return;
 
-            if (CacheApiWrapper.GetActiveLevel().CustomScaling.TryGetValue(CustomScaling.BulletResistance, out var value))
+            if (CacheApiWrapper.GetActiveLevel().CustomScaling.TryGetValue(CustomScaling.BleedResistance, out var value))
                 dam *= 2f - value;
         }
 
