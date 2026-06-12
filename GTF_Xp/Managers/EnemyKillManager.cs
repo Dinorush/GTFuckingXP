@@ -30,7 +30,7 @@ namespace GTFuckingXp.Managers
             var enemyXpData = GetEnemyXp(info.KilledEnemyAgent);
             var position = info.KilledEnemyAgent.Position;
             position.y += 1f;
-            foreach (var player in SNet.LobbyPlayers)
+            foreach (var player in SNet.SessionHub.PlayersInSession)
             {
                 if(player != null && !player.IsBot)
                 {
