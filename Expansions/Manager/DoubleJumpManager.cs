@@ -5,6 +5,7 @@ using GTFuckingXP.Information.Level;
 using HarmonyLib;
 using MTFO.Managers;
 using System.Text.Json;
+using XpExpansions.Information;
 using XpExpansions.Information.DoubleJump;
 
 namespace XpExpansions.Manager
@@ -42,7 +43,7 @@ namespace XpExpansions.Manager
             DoubleJumpUnlocked = false;
         }
 
-        public override void LevelReached(Level level)
+        public override void LevelReached(Player.PlayerAgent player, Level level)
         {
             LogManager.Message($"LevelReached, DoubleJump {level.ToString()}");
             
@@ -80,23 +81,23 @@ namespace XpExpansions.Manager
             string configPath = Path.Combine(FolderPath, _configFileName);
             if (File.Exists(configPath))
             {
-                _baseConfig = JsonSerializer.Deserialize<DoubleJumpConfig>(File.ReadAllText(configPath))!;
+                _baseConfig = ExpJson.Deserialize<DoubleJumpConfig>(File.ReadAllText(configPath))!;
             }
             else
             {
                 var origConfigPath = Path.Combine(ConfigManager.CustomPath, "mccad00", "DoubleJump.json");
                 if (File.Exists(origConfigPath))
-                    _baseConfig = JsonSerializer.Deserialize<DoubleJumpConfig>(File.ReadAllText(origConfigPath))!;
+                    _baseConfig = ExpJson.Deserialize<DoubleJumpConfig>(File.ReadAllText(origConfigPath))!;
                 else
                     _baseConfig = new();
 
-                File.WriteAllText(configPath, JsonSerializer.Serialize(_baseConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = true }));
+                File.WriteAllText(configPath, ExpJson.Serialize(_baseConfig));
             }
         }
 
         private void UpdateEverything()
         {
-            CacheApi.SaveInstance(JsonSerializer.Deserialize<List<DoubleJumpData>>(
+            CacheApi.SaveInstance(ExpJson.Deserialize<List<DoubleJumpData>>(
                 File.ReadAllText(Path.Combine(FolderPath, _expansionFileName))),
                 Extensions.CacheApiWrapper.ExtensionCacheName);
         }

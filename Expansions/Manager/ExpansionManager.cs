@@ -1,6 +1,7 @@
 ﻿using EndskApi.Api;
 using GTFuckingXP.Information.Level;
 using GTFuckingXP.Managers;
+using Player;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -22,6 +23,8 @@ namespace XpExpansions.Manager
             GTFuckingXP.Communication.XpApi.AddOnLevelUpCallback(LevelReached);
             GTFuckingXP.Communication.XpApi.AddScriptsLoaded(LevelInitialized);
         }
+
+        public override bool LocalOnly => false;
 
         public override void Initialize()
         {
@@ -47,14 +50,15 @@ namespace XpExpansions.Manager
             }
         }
 
-        public override void LevelReached(Level level)
+        public override void LevelReached(PlayerAgent player, Level level)
         {
             LogManager.Message("LevelReached in the Expansion Manager.");
 
             var managers = CacheApi.GetInstance<List<BaseManager>>(CacheApiWrapper.ExtensionCacheName);
             foreach (var manager in managers)
             {
-                manager.LevelReached(level);
+                if (!manager.LocalOnly || player.IsLocallyOwned)
+                    manager.LevelReached(player, level);
             }
         }
 
@@ -74,7 +78,7 @@ namespace XpExpansions.Manager
             var managers = new List<BaseManager>();
 
             var expansionsPath = Path.Combine(FolderPath, ExpansionActivePath);
-            var activeExpansions = JsonSerializer.Deserialize<ActiveExpansions>(File.ReadAllText(expansionsPath));
+            var activeExpansions = ExpJson.Deserialize<ActiveExpansions>(File.ReadAllText(expansionsPath));
 
             LogManager.Debug("CreateManagers method.");
 
@@ -99,6 +103,16 @@ namespace XpExpansions.Manager
                 {
                     managers.Add(new ClientSidedBioTrackerManager());
                 }
+
+                if (activeExpansions.PackConverter)
+                {
+                    managers.Add(new PackConverterManager());
+                }
+
+                if (activeExpansions.ToolAbility)
+                {
+                    managers.Add(new ToolAbilityManager());
+                }
             }
 
             return managers;
@@ -114,7 +128,7 @@ namespace XpExpansions.Manager
             var activeExpansionsPath = Path.Combine(FolderPath, ExpansionActivePath);
             if(!File.Exists(activeExpansionsPath))
             {
-                File.WriteAllText(activeExpansionsPath, JsonSerializer.Serialize(new ActiveExpansions(false, true)));
+                File.WriteAllText(activeExpansionsPath, ExpJson.Serialize(new ActiveExpansions()));
             }
         }
     }

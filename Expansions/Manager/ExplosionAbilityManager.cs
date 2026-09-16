@@ -20,10 +20,6 @@ namespace XpExpansions.Manager
             //ExplosionHarmony.PatchAll(typeof(MwsAttackSwingBasePatches));
         }
 
-        public override void LevelReached(Level level)
-        {
-        }
-
         public override void LevelCleanup()
         {
         }

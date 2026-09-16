@@ -23,7 +23,7 @@ namespace EndskApi.Manager.Internal
             if (GetCacheOfMod(mod).TryGetValue(key, out var value))
             {
                 if (value is not T castValue)
-                    throw new KeyNotFoundException($"Tried to get information with key {key}, but it is not type {typeof(T).Name}");
+                    throw new KeyNotFoundException($"Tried to get information with key {key}, but it is type {value.GetType().Name}, not type {typeof(T).Name}");
                 return castValue;
             }
 
@@ -40,7 +40,7 @@ namespace EndskApi.Manager.Internal
                     info = castValue;
                     return true;
                 }
-                LogManager.Warn($"Tried to get information with key {key}, but it is not type {typeof(T).Name}");
+                LogManager.Warn($"Tried to get information with key {key}, but it is type {value.GetType().Name}, not type {typeof(T).Name}");
                 info = default;
                 return false;
             }

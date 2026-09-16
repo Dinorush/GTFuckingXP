@@ -4,9 +4,7 @@ using GTFuckingXP.Information.Enemies;
 using GTFuckingXP.Information.Level;
 using GTFuckingXP.Managers;
 using GTFuckingXP.Scripts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Player;
 
 namespace GTFuckingXP.Communication
 {
@@ -172,7 +170,7 @@ namespace GTFuckingXP.Communication
         /// Adds <paramref name="lvlUpCallback"/> to the lvl up callback list, invoked whenever the local players achieves another level.
         /// </summary>
         /// <param name="lvlUpCallback">The event that should be called, </param>
-        public static void AddOnLevelUpCallback(Action<Level> lvlUpCallback)
+        public static void AddOnLevelUpCallback(Action<PlayerAgent, Level> lvlUpCallback)
         {
             CacheApiWrapper.AddLvlUpCallback(lvlUpCallback);   
         }

@@ -133,7 +133,7 @@ namespace GTFuckingXP.Managers
                         LogManager.Debug($"Setting HP of {player.name} to {newHealth}");
                         player.Damage.HealthMax = newHealth;
 
-                        CacheApiWrapper.SetPlayerActiveLevel(player.PlayerSlotIndex, new(layout, level.LevelNumber));
+                        CacheApiWrapper.SetPlayerActiveLevel(player, new(layout, level.LevelNumber));
                     }
                 }
             }

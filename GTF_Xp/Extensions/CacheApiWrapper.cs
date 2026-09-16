@@ -3,6 +3,7 @@ using GTFuckingXP.Extensions.Information;
 using GTFuckingXP.Information.ClassSelector;
 using GTFuckingXP.Information.Level;
 using GTFuckingXP.Managers;
+using Player;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
@@ -159,13 +160,14 @@ namespace GTFuckingXP.Extensions
                 NetworkApiXpManager.SendNewLevelActive(newLevel);
             }
 
+            var player = PlayerManager.GetLocalPlayerAgent();
             foreach (var callBack in GetLvlUpCallBackList())
             {
-                callBack.Invoke(newLevel);
+                callBack.Invoke(player, newLevel);
             }
         }
 
-        public static bool TryGetFullActiveLevel(Player.PlayerAgent? player, [MaybeNullWhen(false)] out ActiveLevel activeLevel)
+        public static bool TryGetFullActiveLevel(PlayerAgent? player, [MaybeNullWhen(false)] out ActiveLevel activeLevel)
         {
             if (player == null)
             {
@@ -191,7 +193,7 @@ namespace GTFuckingXP.Extensions
             return CacheApi.GetInformation<Level>(ActiveLevelKey, XpModCacheName);
         }
 
-        public static bool TryGetActiveLevel(Player.PlayerAgent? player, [MaybeNullWhen(false)] out Level level)
+        public static bool TryGetActiveLevel(PlayerAgent? player, [MaybeNullWhen(false)] out Level level)
         {
             if (player == null)
             {
@@ -206,7 +208,7 @@ namespace GTFuckingXP.Extensions
             return false;
         }
 
-        public static Level? GetActiveLevel(Player.PlayerAgent player)
+        public static Level? GetActiveLevel(PlayerAgent player)
         {
             if (player == null)
                 return null;
@@ -249,10 +251,16 @@ namespace GTFuckingXP.Extensions
             return ActiveClientLevels;
         }
 
-        public static void SetPlayerActiveLevel(int slot, ActiveLevel activeLevel)
+        public static void SetPlayerActiveLevel(PlayerAgent player, ActiveLevel activeLevel)
         {
+            var slot = player.PlayerSlotIndex;
             GetPlayerToLevelMapping()[slot] = activeLevel.Level;
             ActiveClientLevels[slot] = activeLevel;
+
+            foreach (var callBack in GetLvlUpCallBackList())
+            {
+                callBack.Invoke(player, activeLevel.Level);
+            }
         }
 
         public static void SetXpStorageData(uint knownXpState)
@@ -285,14 +293,14 @@ namespace GTFuckingXP.Extensions
             return CacheApi.TryGetInformation(AnchorDifferenceKey, out anchorDifference, XpModCacheName, logNotFound: false);
         }
 
-        public static void SetLvlUpCallBackList(List<Action<Level>> lvlUpCallbacks)
+        public static void SetLvlUpCallBackList(List<Action<PlayerAgent, Level>> lvlUpCallbacks)
         {
             CacheApi.SaveInformation(LvlUpCallbackKey, lvlUpCallbacks, XpModCacheName);
         }
 
-        public static void AddLvlUpCallback(Action<Level> lvlUpCallback)
+        public static void AddLvlUpCallback(Action<PlayerAgent, Level> lvlUpCallback)
         {
-            CacheApi.GetInformation<List<Action<Level>>>(LvlUpCallbackKey, XpModCacheName).Add(lvlUpCallback);
+            CacheApi.GetInformation<List<Action<PlayerAgent, Level>>>(LvlUpCallbackKey, XpModCacheName).Add(lvlUpCallback);
         }
 
         public static void SetScriptsStartedCallBackList(List<Action<Level>> lvlUpCallbacks)
@@ -310,9 +318,9 @@ namespace GTFuckingXP.Extensions
         //    return CacheApi.GetInformation<List<Action<Level>>>(LvlUpCallbackKey, XpModCacheName).Remove(lvlUpCallback);
         //}
 
-        public static List<Action<Level>> GetLvlUpCallBackList()
+        public static List<Action<PlayerAgent, Level>> GetLvlUpCallBackList()
         {
-            return CacheApi.GetInformation<List<Action<Level>>>(LvlUpCallbackKey, XpModCacheName);
+            return CacheApi.GetInformation<List<Action<PlayerAgent, Level>>>(LvlUpCallbackKey, XpModCacheName);
         }
 
         public static List<Action<Level>> GetScriptsStartedCallbackList()

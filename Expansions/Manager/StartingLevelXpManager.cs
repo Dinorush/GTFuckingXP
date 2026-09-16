@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using XpExpansions.Information;
 using XpExpansions.Information.StartingXp;
 
 namespace XpExpansions.Manager
@@ -25,10 +26,6 @@ namespace XpExpansions.Manager
             UpdateEverything();
         }
 
-        public override void LevelReached(Level level)
-        {
-        }
-
         public override void LevelInitialized(Level level)
         {
             var expedition = RundownManager.ActiveExpedition;
@@ -43,7 +40,7 @@ namespace XpExpansions.Manager
 
         private void UpdateEverything()
         {
-            CacheApi.SaveInstance(JsonSerializer.Deserialize<List<StartingXpData>>(
+            CacheApi.SaveInstance(ExpJson.Deserialize<List<StartingXpData>>(
                 File.ReadAllText(Path.Combine(FolderPath, _expansionFileName))),
                 Extensions.CacheApiWrapper.ExtensionCacheName);
         }
@@ -58,14 +55,7 @@ namespace XpExpansions.Manager
             var startXpPath = Path.Combine(FolderPath, _expansionFileName);
             if (!File.Exists(startXpPath))
             {
-                var serializerOptions = new JsonSerializerOptions
-                {
-                    IncludeFields = false,
-                    ReadCommentHandling = JsonCommentHandling.Skip,
-                    PropertyNameCaseInsensitive = true,
-                    WriteIndented = true
-                };
-                File.WriteAllText(startXpPath, JsonSerializer.Serialize(GetDefaultData(), serializerOptions));
+                File.WriteAllText(startXpPath, ExpJson.Serialize(GetDefaultData()));
             }
         }
 

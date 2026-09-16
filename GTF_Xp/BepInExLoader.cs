@@ -32,7 +32,7 @@ namespace GTFuckingXP
         MODNAME = "GTFuckingXP",
         AUTHOR = "Endskill",
         GUID = AUTHOR + "." + MODNAME,
-        VERSION = "2.7.3";
+        VERSION = "2.8.0";
 
         public static bool RundownDevMode { get; private set; }
         public static ConfigEntry<bool> DebugMessages { get; private set; }
@@ -85,7 +85,7 @@ namespace GTFuckingXP
             Harmony = new Harmony(GUID);
             FasterPatching();
 
-            CacheApiWrapper.SetLvlUpCallBackList(new List<Action<Level>>());
+            CacheApiWrapper.SetLvlUpCallBackList(new());
             CacheApiWrapper.SetScriptsStartedCallBackList(new List<Action<Level>>());
             InitApi.AddInitCallback(() => { ScriptManager.Instance.Initialize(); });
 

@@ -1,4 +1,5 @@
 ﻿using GTFuckingXP.Information.Level;
+using Player;
 using XpExpansions.Extensions;
 
 namespace XpExpansions.Manager
@@ -20,7 +21,9 @@ namespace XpExpansions.Manager
             }
         }
 
-        public abstract void LevelReached(Level level);
+        public virtual bool LocalOnly => true;
+
+        public virtual void LevelReached(PlayerAgent player, Level level) { }
         public virtual void LevelInitialized(Level level) { }
         public virtual void Initialize() { }
         public virtual void LevelCleanup() { }

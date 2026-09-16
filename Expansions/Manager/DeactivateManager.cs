@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using XpExpansions.Information;
 
 namespace XpExpansions.Manager
 {
@@ -13,11 +14,6 @@ namespace XpExpansions.Manager
         private const string _expansionClassFileName = "DeactivateClassLayout.json";
 
         public override void Initialize()
-        {
-
-        }
-
-        public override void LevelReached(Level level)
         {
 
         }
@@ -32,18 +28,11 @@ namespace XpExpansions.Manager
                 Directory.CreateDirectory(FolderPath);
             }
 
-            var serializerOptions = new JsonSerializerOptions
-            {
-                IncludeFields = false,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-                PropertyNameCaseInsensitive = true,
-                WriteIndented = true
-            };
             var doubleJumpPath = Path.Combine(FolderPath, _expansionFileName);
             if (!File.Exists(doubleJumpPath))
             {
                
-                File.WriteAllText(doubleJumpPath, JsonSerializer.Serialize(new List<int>() { 69420,42069}, serializerOptions));
+                File.WriteAllText(doubleJumpPath, ExpJson.Serialize(new List<int>() { 69420,42069}));
             }
         }
     }

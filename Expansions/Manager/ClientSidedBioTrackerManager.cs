@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using XpExpansions.Information;
 using XpExpansions.Information.BioTrackerLocal;
 using XpExpansions.Information.DoubleJump;
 using XpExpansions.Scripts;
@@ -27,7 +28,7 @@ namespace XpExpansions.Manager
             UpdateEverything();
         }
 
-        public override void LevelReached(Level level)
+        public override void LevelReached(Player.PlayerAgent player, Level level)
         {
             var levelLayout = GTFuckingXP.Extensions.CacheApiWrapper.GetCurrentLevelLayout();
             var data = CacheApi.GetInstance<List<LocalBioTrackerData>>(Extensions.CacheApiWrapper.ExtensionCacheName);
@@ -60,20 +61,13 @@ namespace XpExpansions.Manager
             var doubleJumpPath = Path.Combine(FolderPath, _expansionFileName);
             if (!File.Exists(doubleJumpPath))
             {
-                var serializerOptions = new JsonSerializerOptions
-                {
-                    IncludeFields = false,
-                    ReadCommentHandling = JsonCommentHandling.Skip,
-                    PropertyNameCaseInsensitive = true,
-                    WriteIndented = true
-                };
-                File.WriteAllText(doubleJumpPath, JsonSerializer.Serialize(GetDefaultData(), serializerOptions));
+                File.WriteAllText(doubleJumpPath, ExpJson.Serialize(GetDefaultData()));
             }
         }
 
         private void UpdateEverything()
         {
-            CacheApi.SaveInstance(JsonSerializer.Deserialize<List<LocalBioTrackerData>>(
+            CacheApi.SaveInstance(ExpJson.Deserialize<List<LocalBioTrackerData>>(
                 File.ReadAllText(Path.Combine(FolderPath, _expansionFileName))),
                 Extensions.CacheApiWrapper.ExtensionCacheName);
         }
