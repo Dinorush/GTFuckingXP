@@ -33,6 +33,19 @@ namespace Expansions.Patches.ToolAbility
                 ToolAbilityHandler.Instance.OnMineDespawn(__instance);
         }
 
+        [HarmonyPatch(typeof(MineDeployerFirstPerson), nameof(MineDeployerFirstPerson.CanWield), MethodType.Getter)]
+        [HarmonyPrefix]
+        [HarmonyWrapSafe]
+        private static bool PreMineCanWield(MineDeployerFirstPerson __instance, ref bool __result)
+        {
+            if (ToolAbilityHandler.InMineMode && !__instance.m_isConsumable)
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
         [HarmonyPatch(typeof(MineDeployerFirstPerson), nameof(MineDeployerFirstPerson.Update))]
         [HarmonyPrefix]
         [HarmonyWrapSafe]

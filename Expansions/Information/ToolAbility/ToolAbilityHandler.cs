@@ -10,6 +10,8 @@ namespace Expansions.Information.ToolAbility
         public static ToolAbilityHandler Instance { get; private set; } = null!;
         public static bool Exists { get; private set; } = false;
         public static bool MovingMine => Exists && Instance._movingMine != null;
+        public static bool InMineMode => Exists && Instance.DoMineUpdate;
+        public static bool InSentryMode => Exists && Instance.DoSentryUpdate;
         private static PUI_InteractionPrompt s_interactPrompt = null!;
         public static bool CheckCanPlaceIgnoreHidden(MineDeployerFirstPerson deployer)
         {
@@ -36,7 +38,6 @@ namespace Expansions.Information.ToolAbility
         private float _recallDuration = 1f;
         private float _recallDeltaMod = 0;
         private bool _recallingTool = false;
-        private InputAction _recallBind = InputAction.SelectTool;
         private float _toolRecallProgress = 0;
         public float ToolRecallProgress
         {
@@ -140,8 +141,6 @@ namespace Expansions.Information.ToolAbility
                         s_interactPrompt.SetVisible(true);
                     CheckToggleRecall(Text.Get(1420u), InputAction.Reload);
                 }
-                else if (!_mineDeployer.CanWield)
-                    CheckToggleRecall(Text.Get(1420u), InputAction.SelectTool);
                 else
                     s_interactPrompt.SetVisible(false);
             }
@@ -189,10 +188,6 @@ namespace Expansions.Information.ToolAbility
 
         private void CheckToggleRecall(string toolName, InputAction toggleAction)
         {
-            if (_recallingTool && _recallBind != toggleAction)
-                s_interactPrompt.SetPrompt($"Cancel {toolName} Recall", Text.Format(825u, InputMapper.GetBindingName(InputAction.SelectTool)));
-            _recallBind = toggleAction;
-
             if (InputMapper.GetButtonDownKeyMouse(toggleAction, _player.InputFilter))
             {
                 if (!_recallingTool)
@@ -253,7 +248,6 @@ namespace Expansions.Information.ToolAbility
                 _mineDeployer.m_placementIndicator.m_colorEnabled = _origMineColor;
             _mineDeployer = null;
             _activeInteract = null;
-            _recallBind = InputAction.SelectTool;
             StopRecall();
             _activeMines.Clear();
         }
