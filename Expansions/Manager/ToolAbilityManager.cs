@@ -54,19 +54,15 @@ namespace XpExpansions.Manager
         {
             if (!GTFuckingXP.Extensions.CacheApiWrapper.TryGetFullActiveLevel(player, out var activeLevel)) return;
 
-            LogManager.Warn($"{player.Owner.NickName} reached {level.LevelNumber} with layout {activeLevel.Layout.PersistentId}, checking tool abilities...");
             var levelLayoutID = activeLevel.Layout.PersistentId;
             var toolData = JsonData.Find(it => it.LevelLayoutID == levelLayoutID);
-            LogManager.Warn($"Found matching data? {toolData != null}");
             if (toolData != null)
             {
                 for (int i = toolData.DataChanges.Count - 1; i >= 0; i--)
                 {
                     var dataChange = toolData.DataChanges[i];
-                    LogManager.Warn($"Checking level requirement on {dataChange.Level}");
                     if (dataChange.Level <= level.LevelNumber)
                     {
-                        LogManager.Warn($"Level reached with tool ability: {dataChange.Level}, layout ID: {toolData.LevelLayoutID}.\nRecalls: {dataChange.SentryRecall}, {dataChange.MineRecall}. Recall speeds: {dataChange.SentryRecallSpeed}, {dataChange.MineRecallSpeed}. Move mines: {dataChange.MoveMines}");
                         ActiveAbility = dataChange;
                         break;
                     }
