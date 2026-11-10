@@ -120,7 +120,7 @@ namespace Expansions.Information.ToolAbility
             if (ToolRecallProgress == 1)
             {
                 StopRecall(true);
-                ToolAbilityManager.DoSentryPickup(_sentry!);
+                ToolAbilityManager.DoSentryPickup(_player, _sentry!);
             }
         }
 

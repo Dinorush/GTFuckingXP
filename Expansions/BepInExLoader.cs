@@ -19,7 +19,7 @@ namespace XpExpansions
         MODNAME = "XpExpansions",
         AUTHOR = "Endskill",
         GUID = AUTHOR + "." + MODNAME,
-        VERSION = "1.1.1";
+        VERSION = "1.1.2";
 
         public override void Load()
         {
